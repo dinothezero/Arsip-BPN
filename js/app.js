@@ -85,7 +85,7 @@ const App = (() => {
 
   function statCards(items) {
     return items.map(i => `
-      <div class="bg-white rounded-2xl shadow-lg p-5 border-b-4 ${i.border}">
+      <div class="stat-card bg-white rounded-2xl shadow-lg p-5 border-b-4 ${i.border}">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">${i.label}</p>
@@ -101,15 +101,18 @@ const App = (() => {
 
   function renderSidebar(user) {
     const nav = document.getElementById('sidebar-nav');
+    const cur = (location.hash || '#/dashboard').split('?')[0];
     let html = `<div class="px-4 pb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Menu Utama</div>`;
     NAV.forEach(n => {
-      html += `<a href="${n.href}" class="nav-link flex items-center gap-3 px-5 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition">
+      const active = n.href === cur ? ' active' : '';
+      html += `<a href="${n.href}" class="nav-link flex items-center gap-3 px-5 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition ${active}">
         <i class="fas ${n.icon} w-5 text-center text-slate-400"></i><span>${n.label}</span></a>`;
     });
     if (user.role === 'admin') {
       html += `<div class="px-4 pt-5 pb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Administrasi</div>`;
       NAV_ADMIN.forEach(n => {
-        html += `<a href="${n.href}" class="nav-link flex items-center gap-3 px-5 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition">
+        const active = n.href === cur ? ' active' : '';
+        html += `<a href="${n.href}" class="nav-link flex items-center gap-3 px-5 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition ${active}">
           <i class="fas ${n.icon} w-5 text-center text-slate-400"></i><span>${n.label}</span></a>`;
       });
     }
@@ -156,6 +159,9 @@ const App = (() => {
     if (!allowed.includes('all') && !allowed.includes(user.role)) { render403(); return; }
 
     const el = document.getElementById('app-content');
+    el.classList.remove('view-enter');
+    void el.offsetWidth;
+    el.classList.add('view-enter');
     const view = routes[key].render({ user, sub, params });
 
     if (typeof view === 'string') {

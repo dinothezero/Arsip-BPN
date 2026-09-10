@@ -63,7 +63,7 @@ const Views = (() => {
     html += `<div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
       <div class="xl:col-span-2 bg-white rounded-2xl shadow-lg p-6">
         <h3 class="font-semibold text-slate-700 mb-4"><i class="fas fa-chart-line text-bpn-500 mr-2"></i>Grafik Surat 6 Bulan Terakhir</h3>
-        <canvas id="chart-surat" height="120"></canvas>
+        <div style="height:290px"><canvas id="chart-surat"></canvas></div>
       </div>
       <div class="bg-white rounded-2xl shadow-lg p-6">
         <h3 class="font-semibold text-slate-700 mb-4"><i class="fas fa-chart-pie text-bpn-500 mr-2"></i>Status Surat Masuk</h3>
@@ -74,7 +74,7 @@ const Views = (() => {
       html += `<div>
         <div class="flex justify-between text-xs font-medium text-slate-600 mb-1"><span>${s}</span><span>${byStatus[s]} (${pct}%)</span></div>
         <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
-          <div class="h-full rounded-full ${s === 'Baru' ? 'bg-sky-500' : s === 'Diproses' ? 'bg-amber-500' : s === 'Diteruskan' ? 'bg-violet-500' : 'bg-emerald-500'}" style="width:${pct}%"></div>
+          <div class="progress-fill h-full rounded-full ${s === 'Baru' ? 'bg-sky-500' : s === 'Diproses' ? 'bg-amber-500' : s === 'Diteruskan' ? 'bg-violet-500' : 'bg-emerald-500'}" style="width:${pct}%"></div>
         </div>
       </div>`;
     });
@@ -109,7 +109,7 @@ const Views = (() => {
       const max = sorted[0][1] || 1;
       html += `<div class="flex items-center gap-3">
         <span class="w-28 truncate text-xs text-slate-600">${esc(k)}</span>
-        <div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-bpn-500 rounded-full" style="width:${Math.round(v / max * 100)}%"></div></div>
+        <div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden"><div class="progress-fill h-full bg-bpn-500 rounded-full" style="width:${Math.round(v / max * 100)}%"></div></div>
         <span class="text-xs font-semibold text-slate-600 w-6 text-right">${v}</span>
       </div>`;
     });
@@ -134,10 +134,23 @@ const Views = (() => {
     Views._chart = new Chart(c, {
       type: 'line',
       data: { labels, datasets: [
-        { label: 'Surat Masuk', data: masuk, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.08)', fill: true, tension: 0.4, pointBackgroundColor: '#2563eb' },
-        { label: 'Surat Keluar', data: keluar, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.08)', fill: true, tension: 0.4, pointBackgroundColor: '#f59e0b' }
+        { label: 'Surat Masuk', data: masuk, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.10)', fill: true, tension: 0.4, borderWidth: 2.5, pointBackgroundColor: '#2563eb', pointRadius: 4, pointHoverRadius: 6 },
+        { label: 'Surat Keluar', data: keluar, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.10)', fill: true, tension: 0.4, borderWidth: 2.5, pointBackgroundColor: '#f59e0b', pointRadius: 4, pointHoverRadius: 6 }
       ]},
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true } } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 900, easing: 'easeOutQuart' },
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16 } },
+          tooltip: { backgroundColor: '#0f172a', padding: 10, cornerRadius: 8 }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: 'rgba(148,163,184,0.18)' } },
+          x: { grid: { display: false } }
+        }
+      }
     });
   }
 
