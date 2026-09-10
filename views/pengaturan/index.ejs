@@ -101,6 +101,9 @@
                   <i class="fas fa-key text-xs"></i>
                 </button>
               </form>
+              <button type="button" title="Edit" onclick="toggleUserEdit(<%= u.id %>)" class="p-2 rounded-lg text-blue-600 hover:bg-blue-50 transition">
+                <i class="fas fa-pen text-xs"></i>
+              </button>
               <% if (u.id !== user.id) { %>
               <form method="POST" action="/pengaturan/user/<%= u.id %>/delete" onsubmit="return confirm('Hapus user ini?')">
                 <button type="submit" title="Hapus" class="p-2 rounded-lg text-red-500 hover:bg-red-50 transition">
@@ -109,6 +112,37 @@
               </form>
               <% } %>
             </div>
+          </div>
+
+          <div id="user-edit-<%= u.id %>" class="hidden border border-blue-200 bg-blue-50/60 rounded-xl p-4 mt-2">
+            <form method="POST" action="/pengaturan/user/<%= u.id %>/edit" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <p class="text-xs font-semibold text-blue-700 uppercase tracking-wide sm:col-span-2">Edit Pengguna #<%= u.id %> · @<%= u.username %></p>
+              <input type="text" name="nama_lengkap" value="<%= u.nama_lengkap %>" placeholder="Nama Lengkap" class="px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" required>
+              <input type="text" name="nip" value="<%= u.nip || '' %>" placeholder="NIP" class="px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              <select name="jabatan" class="px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                <option value="Staff" <%= u.jabatan === 'Staff' ? 'selected' : '' %>>Staff</option>
+                <option value="Sub Koordinator" <%= u.jabatan === 'Sub Koordinator' ? 'selected' : '' %>>Sub Koordinator</option>
+                <option value="Koordinator" <%= u.jabatan === 'Koordinator' ? 'selected' : '' %>>Koordinator</option>
+                <option value="Kepala Kantor" <%= u.jabatan === 'Kepala Kantor' ? 'selected' : '' %>>Kepala Kantor</option>
+              </select>
+              <select name="role" class="px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                <option value="user" <%= u.role === 'user' ? 'selected' : '' %>>User</option>
+                <option value="kepala" <%= u.role === 'kepala' ? 'selected' : '' %>>Kepala</option>
+                <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>Admin</option>
+              </select>
+              <input type="email" name="email" value="<%= u.email || '' %>" placeholder="Email (opsional)" class="px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              <input type="text" name="telepon" value="<%= u.telepon || '' %>" placeholder="Telepon (opsional)" class="px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              <label class="flex items-center gap-2 text-sm text-slate-600">
+                <input type="checkbox" name="status" value="1" <%= u.status === 1 ? 'checked' : '' %> class="w-4 h-4 rounded text-blue-600">
+                Akun Aktif
+              </label>
+              <div class="flex justify-end gap-2 sm:col-span-2">
+                <button type="button" onclick="toggleUserEdit(<%= u.id %>)" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition">
+                  <i class="fas fa-save mr-1"></i>Simpan
+                </button>
+              </div>
+            </form>
           </div>
           <% }) %>
         </div>

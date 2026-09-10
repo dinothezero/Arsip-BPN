@@ -52,6 +52,21 @@ Server juga otomatis menginisialisasi database saat pertama kali dijalankan.
 
 Buka browser → **http://localhost:3000**
 
+### ▶️ Cara Menjalankan Gratis di Browser (GitHub Codespaces) — Tanpa Instalasi
+
+Tidak perlu install apa pun di komputer. Aplikasi jalan penuh di cloud GitHub dengan **database tersimpan**:
+
+1. Buka repo → https://github.com/dinothezero/Arsip-BPN
+2. Klik tombol hijau **Code ▾**
+3. Pilih tab **Codespaces**
+4. Klik **Create codespace on master**
+5. Tunggu beberapa saat — aplikasi otomatis ter-install & jalan
+6. Klik **Arsip BPN** pada panel *Ports* (port 3000) atau ikon browser di pojok → aplikasi terbuka
+
+> Data tidak hilang: database disimpan di disk workspace dan tetap ada saat Codespace dibuka kembali (bila tidak dihapus). Akun & semua data yang Anda ubah akan tersimpan.
+
+Gratis (dalam kuota bulanan GitHub pribadi) — tanpa kartu kredit, tanpa akun tambahan.
+
 ### Akun Default
 
 | Role | Username | Password |

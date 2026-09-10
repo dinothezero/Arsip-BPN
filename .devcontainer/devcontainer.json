@@ -1,0 +1,20 @@
+{
+  "name": "Arsip BPN",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22-bookworm",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Arsip BPN",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "postCreateCommand": "npm install",
+  "postStartCommand": "DATABASE_PATH=\"$PWD/database/arsip-bpn.db\" node server.js --init-db && (nohup npm start > /tmp/arsip-bpn.log 2>&1 &)",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
+}

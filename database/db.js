@@ -1,7 +1,9 @@
 const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 
-const DB_PATH = path.join(__dirname, 'arsip-bpn.db');
+const DB_PATH = process.env.DATABASE_PATH
+  ? path.resolve(process.env.DATABASE_PATH)
+  : path.join(__dirname, 'arsip-bpn.db');
 
 function getDb() {
   const db = new DatabaseSync(DB_PATH);

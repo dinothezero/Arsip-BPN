@@ -13,3 +13,10 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => flashMsg.classList.add('hidden'), 4000);
   }
 });
+
+function toggleUserEdit(id) {
+  const panel = document.getElementById('user-edit-' + id);
+  if (panel) {
+    panel.classList.toggle('hidden');
+  }
+}
