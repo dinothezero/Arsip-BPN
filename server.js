@@ -67,6 +67,7 @@ app.use('/surat-keluar', require('./routes/suratKeluar'));
 app.use('/arsip', require('./routes/arsip'));
 app.use('/sertifikat', require('./routes/sertifikat'));
 app.use('/disposisi', require('./routes/disposisi'));
+app.use('/profil', require('./routes/profil'));
 app.use('/laporan', require('./routes/laporan'));
 app.use('/pengaturan', require('./routes/pengaturan'));
 app.use('/logs', require('./routes/logs'));
@@ -74,7 +75,8 @@ app.use('/logs', require('./routes/logs'));
 app.use((req, res) => {
   res.status(404).render('errors/404', {
     title: 'Halaman Tidak Ditemukan',
-    user: req.session.user
+    user: req.session.user,
+    layout: false
   });
 });
 
@@ -83,13 +85,14 @@ app.use((err, req, res, next) => {
   res.status(500).render('errors/500', {
     title: 'Terjadi Kesalahan',
     user: req.session.user,
-    message: err.message
+    message: err.message,
+    layout: false
   });
 });
 
 app.listen(PORT, () => {
   console.log(`\n╔════════════════════════════════════════════╗`);
-  console.log(`║   SISTEM ARSIP DIGITAL BPN - RUNNING     ║`);
+  console.log(`║   ARSIP BPN - RUNNING                 ║`);
   console.log(`╠════════════════════════════════════════════╣`);
   console.log(`║  URL      : http://localhost:${PORT}                 ║`);
   console.log(`║  Admin    : admin / admin123              ║`);

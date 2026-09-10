@@ -11,7 +11,8 @@ function isAdmin(req, res, next) {
   }
   return res.status(403).render('errors/forbidden', {
     title: 'Akses Ditolak',
-    user: req.session.user
+    user: req.session.user,
+    layout: false
   });
 }
 
@@ -21,7 +22,8 @@ function isKepala(req, res, next) {
   }
   return res.status(403).render('errors/forbidden', {
     title: 'Akses Ditolak',
-    user: req.session.user
+    user: req.session.user,
+    layout: false
   });
 }
 

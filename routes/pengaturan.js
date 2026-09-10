@@ -32,7 +32,7 @@ router.post('/kantor', isAdmin, (req, res) => {
       nama_kantor = ?, alamat_kantor = ?, telepon_kantor = ?, email_kantor = ?, website = ?,
       updated_at = CURRENT_TIMESTAMP
     WHERE id = 1
-  `).run(nama_kantor, alamat_kantor, telepon_kantor, email_kantor, website);
+  `).run(nama_kantor || '', alamat_kantor || '', telepon_kantor || '', email_kantor || '', website || '');
 
   req.flash = { type: 'success', message: 'Pengaturan kantor berhasil disimpan' };
   res.redirect('/pengaturan');

@@ -20,6 +20,9 @@
     <%- include('nav-item', { href: '/sertifikat', icon: 'fa-file-contract', label: 'Sertifikat Tanah' }) %>
     <%- include('nav-item', { href: '/laporan', icon: 'fa-chart-column', label: 'Laporan' }) %>
 
+    <div class="px-4 pt-5 pb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Akun</div>
+    <%- include('nav-item', { href: '/profil', icon: 'fa-user-circle', label: 'Profil Saya' }) %>
+
     <% if (user.role === 'admin') { %>
       <div class="px-4 pt-5 pb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Administrasi</div>
       <%- include('nav-item', { href: '/logs', icon: 'fa-clock-rotate-left', label: 'Log Aktivitas' }) %>
@@ -33,10 +36,12 @@
         <%= user.nama_lengkap.charAt(0).toUpperCase() %>
       </div>
       <div class="min-w-0 flex-1">
-        <p class="text-sm font-medium truncate"><%= user.nama_lengkap %></p>
-        <p class="text-[11px] text-slate-400 truncate">
-          <span class="capitalize"><%= user.role %></span> · <%= user.jabatan %>
-        </p>
+        <a href="/profil" class="hover:text-white transition">
+          <p class="text-sm font-medium truncate"><%= user.nama_lengkap %></p>
+          <p class="text-[11px] text-slate-400 truncate">
+            <span class="capitalize"><%= user.role %></span> · <%= user.jabatan %>
+          </p>
+        </a>
       </div>
       <a href="/logout" title="Keluar" class="text-slate-400 hover:text-red-400 transition p-2">
         <i class="fas fa-right-from-bracket"></i>
