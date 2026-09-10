@@ -1,0 +1,138 @@
+<div class="max-w-5xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <a href="/sertifikat" class="text-sm text-slate-500 hover:text-violet-600 transition mb-1 inline-flex items-center gap-2">
+        <i class="fas fa-arrow-left text-xs"></i> Kembali
+      </a>
+      <h1 class="text-2xl font-bold text-slate-800 mt-1">Detail Sertifikat</h1>
+    </div>
+    <div class="flex gap-2">
+      <a href="/sertifikat/<%= sertifikat.id %>/edit" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-sm font-medium transition shadow-lg shadow-amber-500/25">
+        <i class="fas fa-pen mr-1"></i>Edit
+      </a>
+      <% if (sertifikat.file_sertifikat) { %>
+        <a href="/uploads/sertifikat/<%= sertifikat.file_sertifikat %>" target="_blank" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-medium transition">
+          <i class="fas fa-download mr-1"></i>Unduh
+        </a>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 bg-gradient-to-r from-violet-600 to-violet-700 flex items-center justify-between">
+      <h3 class="font-semibold text-white"><i class="fas fa-file-contract mr-2"></i>Detail Sertifikat</h3>
+      <span class="text-xs px-3 py-1 rounded-full bg-white/20 text-white font-mono font-semibold"><%= sertifikat.nomor_sertifikat %></span>
+    </div>
+
+    <div class="p-6">
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="bg-violet-50 rounded-xl p-5 sm:col-span-2 flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-semibold text-violet-400 uppercase tracking-wide">Jenis Sertifikat</p>
+            <p class="text-lg font-bold text-violet-800 mt-1"><%= sertifikat.jenis_sertifikat %></p>
+          </div>
+          <div class="text-right">
+            <p class="text-[11px] font-semibold text-violet-400 uppercase tracking-wide">Status</p>
+            <span class="text-xs px-2.5 py-1 rounded-full font-semibold mt-1 inline-block
+              <%= sertifikat.status_sertifikat === 'Aktif' ? 'bg-emerald-100 text-emerald-700' :
+                 sertifikat.status_sertifikat === 'Blokir' ? 'bg-red-100 text-red-700' :
+                 sertifikat.status_sertifikat === 'Sengketa' ? 'bg-amber-100 text-amber-700' :
+                 sertifikat.status_sertifikat === 'Batal' ? 'bg-slate-200 text-slate-600' :
+                 'bg-orange-100 text-orange-700' %>">
+              <%= sertifikat.status_sertifikat %>
+            </span>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 rounded-xl p-4 sm:col-span-2">
+          <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Nama Pemilik</p>
+          <p class="text-base font-semibold text-slate-800 mt-1"><%= sertifikat.nama_pemilik %></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">NIK</p>
+          <p class="text-sm font-semibold text-slate-800 mt-1"><%= sertifikat.nik_pemilik || '-' %></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Luas Tanah</p>
+          <p class="text-sm font-semibold text-slate-800 mt-1"><%= sertifikat.luas_tanah ? Number(sertifikat.luas_tanah).toLocaleString('id-ID') + ' ' + sertifikat.satuan_luas : '-' %></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4 sm:col-span-2">
+          <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Letak Tanah</p>
+          <p class="text-sm font-semibold text-slate-800 mt-1"><%= sertifikat.letak_tanah %></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Kelurahan</p>
+          <p class="text-sm font-semibold text-slate-800 mt-1"><%= sertifikat.kelurahan || '-' %></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Kecamatan</p>
+          <p class="text-sm font-semibold text-slate-800 mt-1"><%= sertifikat.kecamatan || '-' %></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Kabupaten</p>
+          <p class="text-sm font-semibold text-slate-800 mt-1"><%= sertifikat.kabupaten || '-' %></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Provinsi</p>
+          <p class="text-sm font-semibold text-slate-800 mt-1"><%= sertifikat.provinsi || '-' %></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Nomor Petak</p>
+          <p class="text-sm font-semibold text-slate-800 mt-1"><%= sertifikat.nomor_petak || '-' %></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Letter C</p>
+          <p class="text-sm font-semibold text-slate-800 mt-1"><%= sertifikat.letter_c || '-' %></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Tanggal Terbit</p>
+          <p class="text-sm font-semibold text-slate-800 mt-1"><%= sertifikat.tanggal_terbit ? new Date(sertifikat.tanggal_terbit).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-' %></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Diinput Oleh</p>
+          <p class="text-sm font-semibold text-slate-800 mt-1"><%= sertifikat.nama_operator || '-' %></p>
+        </div>
+      </div>
+
+      <% if (sertifikat.alamat_pemilik) { %>
+      <div class="mt-5">
+        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Alamat Pemilik</p>
+        <p class="text-sm text-slate-600 bg-slate-50 rounded-xl p-4"><%= sertifikat.alamat_pemilik %></p>
+      </div>
+      <% } %>
+
+      <% if (sertifikat.keterangan) { %>
+      <div class="mt-5">
+        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Keterangan</p>
+        <p class="text-sm text-slate-600 bg-slate-50 rounded-xl p-4"><%= sertifikat.keterangan %></p>
+      </div>
+      <% } %>
+
+      <% if (sertifikat.file_sertifikat) { %>
+      <div class="mt-5 flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
+            <i class="fas fa-file-pdf"></i>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-emerald-800">File Sertifikat</p>
+            <p class="text-xs text-emerald-600"><%= sertifikat.file_sertifikat %></p>
+          </div>
+        </div>
+        <a href="/uploads/sertifikat/<%= sertifikat.file_sertifikat %>" target="_blank" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium transition">
+          <i class="fas fa-download mr-1"></i>Unduh
+        </a>
+      </div>
+      <% } %>
+    </div>
+
+    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+      <span class="text-xs text-slate-400">Dibuat: <%= new Date(sertifikat.created_at).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></span>
+      <form method="POST" action="/sertifikat/<%= sertifikat.id %>/delete" onsubmit="return confirm('Yakin ingin menghapus sertifikat ini?')">
+        <button type="submit" class="text-red-500 hover:text-red-700 text-xs font-medium inline-flex items-center gap-1">
+          <i class="fas fa-trash text-xs"></i> Hapus Sertifikat
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

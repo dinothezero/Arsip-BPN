@@ -1,0 +1,19 @@
+{
+  "name": "bpn-arsip",
+  "version": "1.0.0",
+  "description": "Sistem Arsip Digital - Badan Pertanahan Nasional",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "init-db": "node database/init.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.18.1",
+    "multer": "^1.4.5-lts.1"
+  }
+}

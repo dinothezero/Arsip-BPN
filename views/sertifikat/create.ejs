@@ -1,0 +1,130 @@
+<div class="max-w-4xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <a href="/sertifikat" class="text-sm text-slate-500 hover:text-violet-600 transition mb-1 inline-flex items-center gap-2">
+        <i class="fas fa-arrow-left text-xs"></i> Kembali
+      </a>
+      <h1 class="text-2xl font-bold text-slate-800 mt-1">Tambah Sertifikat Tanah</h1>
+      <p class="text-slate-500 text-sm mt-1">Registrasi data sertifikat tanah baru</p>
+    </div>
+  </div>
+
+  <form method="POST" action="/sertifikat/create" enctype="multipart/form-data" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="border-b border-slate-100 px-6 py-4 bg-slate-50">
+      <h3 class="font-semibold text-slate-700"><i class="fas fa-file-contract text-violet-600 mr-2"></i>Data Sertifikat</h3>
+    </div>
+
+    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Nomor Sertifikat <span class="text-red-500">*</span></label>
+        <input type="text" name="nomor_sertifikat" placeholder="Contoh: 00123/HM/2024" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none transition font-mono" required>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Jenis Sertifikat <span class="text-red-500">*</span></label>
+        <select name="jenis_sertifikat" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none bg-white" required>
+          <option value="">-- Pilih Jenis --</option>
+          <option value="Hak Milik">Hak Milik</option>
+          <option value="Hak Guna Bangunan">Hak Guna Bangunan</option>
+          <option value="Hak Pakai">Hak Pakai</option>
+          <option value="Tanah Negara">Tanah Negara</option>
+          <option value="Tanah Wakaf">Tanah Wakaf</option>
+          <option value="Lainnya">Lainnya</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Nama Pemilik <span class="text-red-500">*</span></label>
+        <input type="text" name="nama_pemilik" placeholder="Nama lengkap pemilik" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none transition" required>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">NIK Pemilik</label>
+        <input type="text" name="nik_pemilik" placeholder="Nomor Induk Kependudukan" maxlength="16" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none transition">
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Alamat Pemilik</label>
+        <textarea name="alamat_pemilik" rows="2" placeholder="Alamat lengkap pemilik" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none transition resize-y"></textarea>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Luas Tanah</label>
+        <div class="flex gap-2">
+          <input type="number" name="luas_tanah" step="0.01" min="0" placeholder="0.00" class="flex-1 px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none transition">
+          <select name="satuan_luas" class="px-3 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none bg-white">
+            <option value="m2">m²</option>
+            <option value="ha">Ha</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Tanggal Terbit</label>
+        <input type="date" name="tanggal_terbit" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none">
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Letak / Lokasi Tanah <span class="text-red-500">*</span></label>
+        <input type="text" name="letak_tanah" placeholder="Alamat / letak tanah" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none transition" required>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Kelurahan</label>
+        <input type="text" name="kelurahan" placeholder="Kelurahan / desa" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none transition">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Kecamatan</label>
+        <input type="text" name="kecamatan" placeholder="Kecamatan" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none transition">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Kabupaten</label>
+        <input type="text" name="kabupaten" placeholder="Kabupaten / kota" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none transition">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Provinsi</label>
+        <input type="text" name="provinsi" placeholder="Provinsi" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none transition">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Nomor Petak</label>
+        <input type="text" name="nomor_petak" placeholder="Nomor petak di peta" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none transition">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Letter C</label>
+        <input type="text" name="letter_c" placeholder="Nomor letter C" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none transition">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Status Sertifikat</label>
+        <select name="status_sertifikat" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none bg-white">
+          <option value="Aktif" selected>Aktif</option>
+          <option value="Blokir">Blokir</option>
+          <option value="Sengketa">Sengketa</option>
+          <option value="Batal">Batal</option>
+          <option value="Expired">Expired</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Keterangan</label>
+        <input type="text" name="keterangan" placeholder="Catatan tambahan" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none transition">
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Upload File Sertifikat</label>
+        <div class="relative">
+          <input type="file" name="file_sertifikat" id="fileInput" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+          <div id="fileDrop" class="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center hover:border-violet-500 hover:bg-violet-50 transition cursor-pointer">
+            <i class="fas fa-cloud-arrow-up text-slate-400 text-xl mb-1 block"></i>
+            <p class="text-xs text-slate-500 font-medium" id="fileName">Klik untuk upload file (PDF, Gambar)</p>
+            <p class="text-[10px] text-slate-400 mt-0.5">Maksimal 10MB</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
+      <a href="/sertifikat" class="px-5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-200 transition">Batal</a>
+      <button type="submit" class="px-6 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-sm font-semibold shadow-lg shadow-violet-600/25 transition-all hover:shadow-xl">
+        <i class="fas fa-save mr-2"></i>Simpan Sertifikat
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.getElementById('fileInput').addEventListener('change', function() {
+    if (this.files.length > 0) {
+      document.getElementById('fileName').textContent = this.files[0].name;
+    }
+  });
+</script>

@@ -1,0 +1,327 @@
+<div class="max-w-7xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800">Dashboard</h1>
+      <p class="text-slate-500 text-sm mt-1">Ringkasan aktivitas arsip dan surat kantor</p>
+    </div>
+    <div class="hidden md:flex gap-3">
+      <a href="/surat-masuk/create" class="bg-bpn-600 hover:bg-bpn-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg shadow-bpn-600/25 transition-all hover:shadow-xl hover:-translate-y-0.5">
+        <i class="fas fa-plus mr-2"></i>Surat Masuk
+      </a>
+      <a href="/surat-keluar/create" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-600/25 transition-all hover:shadow-xl hover:-translate-y-0.5">
+        <i class="fas fa-plus mr-2"></i>Surat Keluar
+      </a>
+      <a href="/arsip/create" class="bg-slate-700 hover:bg-slate-800 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg shadow-slate-700/25 transition-all hover:shadow-xl hover:-translate-y-0.5">
+        <i class="fas fa-plus mr-2"></i>Arsip Baru
+      </a>
+    </div>
+  </div>
+
+  <div id="flashMessage" class="hidden mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm flex items-center justify-between">
+    <span><i class="fas fa-check-circle mr-2"></i><span id="flashText"></span></span>
+    <button onclick="document.getElementById('flashMessage').classList.add('hidden')" class="text-emerald-500 hover:text-emerald-700"><i class="fas fa-times"></i></button>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+    <div class="bg-white rounded-2xl p-5 border border-slate-200 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-blue-100 text-bpn-600 flex items-center justify-center shrink-0">
+          <i class="fas fa-inbox text-lg"></i>
+        </div>
+        <div>
+          <p class="text-[11px] text-slate-500 font-medium">Surat Masuk</p>
+          <p class="text-xl font-bold text-slate-800"><%= stats.totalSuratMasuk %></p>
+        </div>
+      </div>
+      <p class="text-[11px] text-emerald-600 mt-2"><i class="fas fa-arrow-up mr-1"></i><%= stats.suratMasukBulanIni %> bulan ini</p>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 border border-slate-200 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+          <i class="fas fa-paper-plane text-lg"></i>
+        </div>
+        <div>
+          <p class="text-[11px] text-slate-500 font-medium">Surat Keluar</p>
+          <p class="text-xl font-bold text-slate-800"><%= stats.totalSuratKeluar %></p>
+        </div>
+      </div>
+      <p class="text-[11px] text-emerald-600 mt-2"><i class="fas fa-arrow-up mr-1"></i><%= stats.suratKeluarBulanIni %> bulan ini</p>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 border border-slate-200 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+          <i class="fas fa-box-archive text-lg"></i>
+        </div>
+        <div>
+          <p class="text-[11px] text-slate-500 font-medium">Arsip Dokumen</p>
+          <p class="text-xl font-bold text-slate-800"><%= stats.totalArsip %></p>
+        </div>
+      </div>
+      <p class="text-[11px] text-slate-400 mt-2"><i class="fas fa-folder mr-1"></i>Total arsip</p>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 border border-slate-200 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
+          <i class="fas fa-file-contract text-lg"></i>
+        </div>
+        <div>
+          <p class="text-[11px] text-slate-500 font-medium">Sertifikat</p>
+          <p class="text-xl font-bold text-slate-800"><%= stats.totalSertifikat %></p>
+        </div>
+      </div>
+      <p class="text-[11px] text-slate-400 mt-2"><i class="fas fa-house mr-1"></i>Data tanah</p>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 border border-slate-200 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+          <i class="fas fa-users text-lg"></i>
+        </div>
+        <div>
+          <p class="text-[11px] text-slate-500 font-medium">Pengguna</p>
+          <p class="text-xl font-bold text-slate-800"><%= stats.totalUsers %></p>
+        </div>
+      </div>
+      <p class="text-[11px] text-slate-400 mt-2"><i class="fas fa-user-check mr-1"></i>Akun aktif</p>
+    </div>
+
+    <div class="bg-gradient-to-br from-bpn-600 to-bpn-800 rounded-2xl p-5 text-white shadow-lg shadow-bpn-600/30 hover:shadow-xl hover:-translate-y-0.5 transition-all">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center shrink-0">
+          <i class="fas fa-layer-group text-lg"></i>
+        </div>
+        <div>
+          <p class="text-[11px] text-bpn-200 font-medium">Total Transaksi</p>
+          <p class="text-xl font-bold"><%= stats.totalSuratMasuk + stats.totalSuratKeluar + stats.totalArsip + stats.totalSertifikat %></p>
+        </div>
+      </div>
+      <p class="text-[11px] text-bpn-300 mt-2"><i class="fas fa-database mr-1"></i>Semua modul</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+    <div class="xl:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <h3 class="font-semibold text-slate-800">Statistik Surat 6 Bulan</h3>
+          <p class="text-xs text-slate-400">Perbandingan surat masuk & keluar</p>
+        </div>
+        <div class="flex gap-1">
+          <input type="radio" name="chartType" id="chartBar" class="chart-radio hidden" checked>
+          <label for="chartBar" class="text-xs px-3 py-1.5 rounded-lg cursor-pointer border border-slate-200 font-medium" data-radio-for="bar">Bar</label>
+          <input type="radio" name="chartType" id="chartLine" class="chart-radio hidden">
+          <label for="chartLine" class="text-xs px-3 py-1.5 rounded-lg cursor-pointer border border-slate-200 font-medium" data-radio-for="line">Line</label>
+        </div>
+      </div>
+      <canvas id="suratChart" height="120"></canvas>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h3 class="font-semibold text-slate-800 mb-1">Status Surat Masuk</h3>
+      <p class="text-xs text-slate-400 mb-5">Distribusi status saat ini</p>
+      <canvas id="statusChart" height="220"></canvas>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-slate-800">Surat Masuk Terbaru</h3>
+        <a href="/surat-masuk" class="text-xs text-bpn-600 hover:text-bpn-800 font-medium">Lihat semua <i class="fas fa-arrow-right ml-1"></i></a>
+      </div>
+      <div class="space-y-3">
+        <% if (suratMasukTerbaru.length === 0) { %>
+          <p class="text-sm text-slate-400 text-center py-8">Belum ada surat masuk</p>
+        <% } %>
+        <% suratMasukTerbaru.forEach(s => { %>
+        <a href="/surat-masuk/<%= s.id %>" class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition group">
+          <div class="w-9 h-9 rounded-lg bg-blue-50 text-bpn-600 flex items-center justify-center shrink-0 group-hover:bg-bpn-600 group-hover:text-white transition">
+            <i class="fas fa-file-lines text-sm"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium text-slate-700 truncate group-hover:text-bpn-700 transition"><%= s.perihal %></p>
+            <p class="text-xs text-slate-400 mt-0.5"><%= s.pengirim %> · <%= formatTanggalShort(s.tanggal_diterima) %></p>
+          </div>
+          <span class="text-[10px] px-2 py-1 rounded-full shrink-0 font-semibold
+            <%= s.status === 'Baru' ? 'bg-blue-50 text-bpn-600' :
+               s.status === 'Diproses' ? 'bg-amber-50 text-amber-600' :
+               s.status === 'Selesai' ? 'bg-emerald-50 text-emerald-600' :
+               'bg-violet-50 text-violet-600' %>">
+            <%= s.status %>
+          </span>
+        </a>
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-slate-800">Surat Keluar Terbaru</h3>
+        <a href="/surat-keluar" class="text-xs text-bpn-600 hover:text-bpn-800 font-medium">Lihat semua <i class="fas fa-arrow-right ml-1"></i></a>
+      </div>
+      <div class="space-y-3">
+        <% if (suratKeluarTerbaru.length === 0) { %>
+          <p class="text-sm text-slate-400 text-center py-8">Belum ada surat keluar</p>
+        <% } %>
+        <% suratKeluarTerbaru.forEach(s => { %>
+        <a href="/surat-keluar/<%= s.id %>" class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition group">
+          <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition">
+            <i class="fas fa-file-arrow-up text-sm"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium text-slate-700 truncate group-hover:text-emerald-700 transition"><%= s.perihal %></p>
+            <p class="text-xs text-slate-400 mt-0.5"><%= s.tujuan %> · <%= formatTanggalShort(s.tanggal_surat) %></p>
+          </div>
+          <span class="text-[10px] px-2 py-1 rounded-full shrink-0 font-semibold
+            <%= s.status === 'Draft' ? 'bg-slate-100 text-slate-600' :
+               s.status === 'Disetujui' ? 'bg-blue-50 text-bpn-600' :
+               s.status === 'Dikirim' ? 'bg-amber-50 text-amber-600' :
+               'bg-emerald-50 text-emerald-600' %>">
+            <%= s.status %>
+          </span>
+        </a>
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-slate-800">Aktivitas Terbaru</h3>
+        <a href="/logs" class="text-xs text-bpn-600 hover:text-bpn-800 font-medium">Log lengkap <i class="fas fa-arrow-right ml-1"></i></a>
+      </div>
+      <div class="space-y-3">
+        <% if (aktifitasTerbaru.length === 0) { %>
+          <p class="text-sm text-slate-400 text-center py-8">Belum ada aktivitas</p>
+        <% } %>
+        <% aktifitasTerbaru.forEach(a => { %>
+        <div class="flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition">
+          <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center shrink-0">
+            <i class="fas fa-user text-xs"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm text-slate-700 leading-snug"><span class="font-medium"><%= a.nama_lengkap || a.username %></span> <%= a.aktivitas.toLowerCase() %></p>
+            <p class="text-[11px] text-slate-400 mt-0.5">
+              <%= new Date(a.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) %>
+              <% if (a.modul) { %> · <span class="text-bpn-500"><%= a.modul %></span><% } %>
+            </p>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const bulanLabel = <%= JSON.stringify(chartData.suratMasukPerBulan.map(b => b.bulan)) %>.map(b => {
+    const [y, m] = b.split('-');
+    const names = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    return names[Number(m) - 1] + ' ' + y.slice(2);
+  });
+
+  const dataMasuk = <%= JSON.stringify(chartData.suratMasukPerBulan.map(b => b.jumlah)) %>;
+  const dataKeluar = <%= JSON.stringify(chartData.suratKeluarPerBulan.map(b => b.jumlah)) %>;
+
+  const suratCtx = document.getElementById('suratChart').getContext('2d');
+  const suratChart = new Chart(suratCtx, {
+    type: 'bar',
+    data: {
+      labels: bulanLabel,
+      datasets: [
+        {
+          label: 'Surat Masuk',
+          data: dataMasuk,
+          backgroundColor: 'rgba(37, 99, 235, 0.75)',
+          borderColor: '#2563eb',
+          borderWidth: 2,
+          borderRadius: 6,
+          maxBarThickness: 36
+        },
+        {
+          label: 'Surat Keluar',
+          data: dataKeluar,
+          backgroundColor: 'rgba(16, 185, 129, 0.75)',
+          borderColor: '#10b981',
+          borderWidth: 2,
+          borderRadius: 6,
+          maxBarThickness: 36
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { usePointStyle: true, padding: 20, font: { family: 'Inter', size: 12 } }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(148, 163, 184, 0.1)' },
+          ticks: { stepSize: 1, font: { family: 'Inter', size: 11 } }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { font: { family: 'Inter', size: 11 } }
+        }
+      }
+    }
+  });
+
+  document.querySelectorAll('.chart-radio').forEach(radio => {
+    radio.addEventListener('change', () => {
+      suratChart.config.type = radio.id === 'chartLine' ? 'line' : 'bar';
+      suratChart.update();
+      document.querySelectorAll('[data-radio-for]').forEach(l => {
+        const act = l.dataset.radioFor;
+        if ((radio.id === 'chartLine' ? 'line' : 'bar') === act) {
+          l.classList.add('bg-bpn-600', 'text-white', 'border-bpn-600');
+          l.classList.remove('border-slate-200');
+        } else {
+          l.classList.remove('bg-bpn-600', 'text-white', 'border-bpn-600');
+          l.classList.add('border-slate-200');
+        }
+      });
+    });
+  });
+
+  const statusCtx = document.getElementById('statusChart').getContext('2d');
+  const statusMasuk = <%= JSON.stringify(chartData.statusMasuk) %>;
+  const statusColors = {
+    'Baru': '#3b82f6',
+    'Diproses': '#f59e0b',
+    'Selesai': '#10b981',
+    'Diteruskan': '#8b5cf6'
+  };
+
+  new Chart(statusCtx, {
+    type: 'doughnut',
+    data: {
+      labels: statusMasuk.map(s => s.status),
+      datasets: [{
+        data: statusMasuk.map(s => s.jumlah),
+        backgroundColor: statusMasuk.map(s => statusColors[s.status] || '#94a3b8'),
+        borderWidth: 3,
+        borderColor: '#ffffff',
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { usePointStyle: true, padding: 14, font: { family: 'Inter', size: 12 } }
+        }
+      }
+    }
+  });
+</script>

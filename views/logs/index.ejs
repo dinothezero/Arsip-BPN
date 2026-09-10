@@ -1,0 +1,118 @@
+<div class="max-w-7xl mx-auto">
+  <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800">Log Aktivitas</h1>
+      <p class="text-slate-500 text-sm mt-1">Riwayat aktivitas seluruh pengguna (total: <%= total %>)</p>
+    </div>
+    <form method="POST" action="/logs/clear" onsubmit="return confirm('Hapus semua log aktivitas?')">
+      <button type="submit" class="bg-red-50 text-red-600 hover:bg-red-100 text-sm font-medium px-4 py-2.5 rounded-xl border border-red-200 transition">
+        <i class="fas fa-trash mr-2"></i>Bersihkan Log
+      </button>
+    </form>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="p-5 border-b border-slate-100">
+      <form method="GET" class="flex flex-wrap gap-3 items-end">
+        <div class="flex-1 min-w-[200px]">
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-1">Cari</label>
+          <div class="relative">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+            <input type="text" name="q" value="<%= filters.q || '' %>" placeholder="Cari aktivitas..."
+              class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-bpn-500 focus:border-bpn-500 outline-none transition">
+          </div>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-1">Pengguna</label>
+          <select name="user" class="px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-bpn-500 outline-none bg-white">
+            <option value="">Semua</option>
+            <% users.forEach(u => { %>
+              <option value="<%= u.id %>" <%= String(filters.user) === String(u.id) ? 'selected' : '' %>><%= u.nama_lengkap %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-1">Modul</label>
+          <select name="modul" class="px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-bpn-500 outline-none bg-white">
+            <option value="">Semua</option>
+            <% moduls.forEach(m => { %>
+              <option value="<%= m.modul %>" <%= filters.modul === m.modul ? 'selected' : '' %>><%= m.modul %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="flex gap-2">
+          <button type="submit" class="px-4 py-2 bg-bpn-600 hover:bg-bpn-700 text-white rounded-xl text-sm font-medium transition">
+            <i class="fas fa-filter mr-1"></i>Filter
+          </button>
+          <a href="/logs" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-medium transition">
+            <i class="fas fa-rotate-left mr-1"></i>Reset
+          </a>
+        </div>
+      </form>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-slate-50 text-left text-[11px] uppercase tracking-wider text-slate-500">
+            <th class="px-5 py-3.5 font-semibold">Waktu</th>
+            <th class="px-5 py-3.5 font-semibold">Pengguna</th>
+            <th class="px-5 py-3.5 font-semibold">Modul</th>
+            <th class="px-5 py-3.5 font-semibold">Aktivitas</th>
+            <th class="px-5 py-3.5 font-semibold">IP Address</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <% if (logs.length === 0) { %>
+          <tr>
+            <td colspan="5" class="px-5 py-16 text-center">
+              <div class="text-5xl text-slate-200 mb-4"><i class="fas fa-clock-rotate-left"></i></div>
+              <p class="text-slate-400 font-medium">Belum ada log aktivitas</p>
+            </td>
+          </tr>
+          <% } %>
+
+          <% logs.forEach(l => { %>
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-5 py-3.5 text-slate-500 text-xs whitespace-nowrap">
+              <%= new Date(l.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+              <span class="text-slate-400"><%= new Date(l.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) %></span>
+            </td>
+            <td class="px-5 py-3.5">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-full bg-bpn-50 text-bpn-600 flex items-center justify-center text-xs font-bold shrink-0">
+                  <%= (l.nama_lengkap || l.username || '?').charAt(0).toUpperCase() %>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-slate-700"><%= l.nama_lengkap || l.username || 'Sistem' %></p>
+                  <p class="text-[10px] text-slate-400">@<%= l.username || '-' %></p>
+                </div>
+              </div>
+            </td>
+            <td class="px-5 py-3.5">
+              <span class="text-xs px-2.5 py-1 rounded-lg bg-blue-50 text-bpn-600 font-medium"><%= l.modul || 'Sistem' %></span>
+            </td>
+            <td class="px-5 py-3.5 text-slate-600"><%= l.aktivitas %></td>
+            <td class="px-5 py-3.5"><span class="font-mono text-xs text-slate-400"><%= l.ip_address || '-' %></span></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <% if (totalPages > 1) { %>
+    <div class="px-5 py-4 border-t border-slate-100 flex items-center justify-between">
+      <p class="text-xs text-slate-500">Halaman <%= page %> dari <%= totalPages %></p>
+      <div class="flex gap-1">
+        <% for (let p = 1; p <= totalPages; p++) { %>
+          <a href="?page=<%= p %>&user=<%= filters.user || '' %>&modul=<%= filters.modul || '' %>&q=<%= filters.q || '' %>"
+             class="w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition
+             <%= p === page ? 'bg-bpn-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' %>">
+            <%= p %>
+          </a>
+        <% } %>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</div>
