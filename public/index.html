@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistem Arsip - Kantor Pertanahan</title>
+<meta name="description" content="Sistem Arsip Digital Kantor Pertanahan - Berjalan 100% lokal, tanpa biaya.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230b6e4f'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23fff' font-family='Arial' font-weight='bold'%3EA%3C/text%3E%3C/svg%3E">
+<!-- Font offline dipakai apapun keadaannya -->
+<link rel="preload" href="/fonts/pjs-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/vendor/fa/css/all.min.css">
+</head>
+<body>
+  <div id="splash">
+    <div class="s-logo">A</div>
+    <div class="s-text">S I S T E M&nbsp;&nbsp;A R S I P</div>
+    <div class="s-sub">Kantor Pertanahan - Lokal &amp; Gratis</div>
+    <div class="s-bar"><span></span></div>
+  </div>
+
+  <div id="app" class="hidden">
+    <!-- Sidebar di-render JS -->
+    <aside id="sidebar"></aside>
+    <div id="main">
+      <header id="topbar"></header>
+      <main id="content"></main>
+    </div>
+  </div>
+
+  <!-- Login (di-render JS) -->
+  <div id="login-screen" class="hidden"></div>
+
+  <div id="modal-backdrop" class="hidden">
+    <div id="modal-box"><div class="modal-head"><h3 id="modal-title"></h3><button class="icon-btn" onclick="Modal.close()"><i class="fas fa-times"></i></button></div><div class="modal-body" id="modal-body"></div><div class="modal-foot" id="modal-foot"></div></div>
+  </div>
+
+  <div id="toast-wrap"></div>
+
+  <script src="/vendor/chart.js/chart.umd.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/views.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

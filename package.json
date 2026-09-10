@@ -1,19 +1,25 @@
 {
   "name": "arsip-bpn",
-  "version": "1.0.0",
-  "description": "Arsip BPN - Sistem Arsip Digital Badan Pertanahan Nasional",
-  "main": "server.js",
+  "version": "2.0.0",
+  "description": "Sistem Arsip Digital Kantor Pertanahan - berjalan 100% lokal, tanpa biaya",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=22.5.0"
+  },
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js",
-    "init-db": "node database/init.js"
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "init-db": "node src/db/init.js",
+    "seed": "node src/db/seed.js",
+    "migrate": "node src/db/migrate.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "ejs": "^3.1.10",
-    "express": "^4.21.1",
-    "express-ejs-layouts": "^2.5.1",
+    "chart.js": "^4.5.1",
+    "exceljs": "^4.4.0",
+    "express": "^4.21.2",
     "express-session": "^1.18.1",
-    "multer": "^1.4.5-lts.1"
+    "multer": "^2.0.1",
+    "qrcode": "^1.5.4"
   }
 }

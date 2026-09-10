@@ -1,123 +1,97 @@
-# 📁 Arsip BPN
+# 📁 Sistem Arsip Digital — Kantor Pertanahan (v2 Lokal)
 
-Sistem pengelolaan arsip digital lengkap untuk **Kantor Pertanahan / Badan Pertanahan Nasional (BPN)**. Dibangun sebagai *full-stack web application* dengan stack 100% gratis (zero cost).
+Aplikasi pengelolaan arsip digital untuk **Kantor Pertanahan / BPN**. Berjalan **100% lokal** di satu komputer atau LAN kantor — tanpa internet, tanpa biaya lisensi, tanpa akun cloud.
 
-## ✨ Fitur Utama
+## ✨ Modul
 
 | Modul | Deskripsi |
 |-------|-----------|
-| 📊 **Dashboard** | Statistik lengkap, grafik surat 6 bulan, status surat, aktivitas terbaru |
-| 📥 **Surat Masuk** | Registrasi, upload file, status tracking, nomor agenda otomatis |
-| 📤 **Surat Keluar** | Registrasi, approval kepala, status `Draft → Disetujui → Dikirim → Selesai` |
-| 🔀 **Disposisi Surat** | Penerusan surat ke seksi/unit, prioritas (Segera/Penting/Biasa) |
-| 📦 **Arsip Dokumen** | Kode arsip otomatis per kategori, lokasi rak/box, upload file |
-| 📜 **Sertifikat Tanah** | Data sertifikat (HM/HGB/HP/dll), NIK, luas, letak, letter C, status |
-| 📈 **Laporan** | Rekap tahun berjalan, laporan surat masuk/keluar/sertifikat/arsip, cetak |
-| 👥 **Manajemen User** | Peran admin / kepala / user, reset password, akun aktif/nonaktif |
-| 👤 **Profil & Keamanan** | Ubah profil & password sendiri (self-service), aktivitas dicatat |
-| 🗂️ **Kategori Surat** | Kelola kategori surat sesuai kebutuhan kantor |
-| 🛡️ **Log Aktivitas** | Rekam jejak seluruh aktivitas pengguna dengan filter & paginasi |
-| 💾 **Backup Database** | Backup manual database sekali klik |
+| 📊 **Dashboard** | Statistik arsip, grafik tren 6 bulan, grafik status, grafik kategori |
+| 📦 **Arsip Dokumen** | Registrasi, upload file, nomor arsip otomatis per kategori, kategori/lokasi/unit/instansi, QR code, cari & filter, edit, hapus lunak/permanen |
+| 🗑️ **Tempat Sampah** | Pulihkan atau hapus permanen; kosongkan sampah |
+| 🔀 **Disposisi** | Penerusan arsip ke unit/seksi, tanda baca, prioritas |
+| 📤 **Peminjaman** | Catat peminjaman & pengembalian arsip |
+| 📖 **Buku Agenda** | Agenda surat masuk & keluar, nomor agenda otomatis |
+| 📅 **Kalender** | Kalender aktivitas arsip |
+| 📈 **Laporan & Ekspor** | Rekap arsip, cetak ber-kop surat, ekspor CSV / Excel (XLSX), backup database (JSON) |
+| 🗂️ **Master Data** | Kategori, lokasi rak, unit/seksi, instansi |
+| 👥 **Manajemen Pengguna** | Akun admin / staf / kepala, aktif/nonaktif, reset password |
+| 🛡️ **Log Aktivitas** | Rekam jejak aktivitas pengguna |
+| 👤 **Profil Kantor** | Kop surat untuk cetak laporan |
 
 ## 🛠️ Teknologi (Semua Gratis)
 
 - **Backend**: Node.js + Express.js
-- **Database**: SQLite (`node:sqlite`) — tanpa server, tanpa native compile, file lokal
-- **Template**: EJS dengan Tailwind CSS
-- **Chart**: Chart.js
-- **Session**: express-session + MemoryStore
-- **Password**: bcryptjs (hashing)
+- **Database**: SQLite bawaan Node (`node:sqlite`) — tanpa server, tanpa instalasi tambahan
+- **Frontend**: Single-Page Application vanilla JS + CSS kustom, font offline (Lora + Plus Jakarta Sans), Chart.js lokal
+- **Session**: express-session + bcryptjs
 
 ## 🚀 Cara Menjalankan
 
 ### Prasyarat
-- **Node.js** versi 22.5+ (mendukung `node:sqlite`) → unduh gratis di [nodejs.org](https://nodejs.org)
+- **Node.js 22.5 atau lebih baru** (mendukung `node:sqlite`) → unduh gratis di [nodejs.org](https://nodejs.org)
 
-### Langkah
+### Linux / macOS / Terminal
 ```bash
-# 1. Masuk ke folder project
 cd arsip-bpn
-
-# 2. Install dependencies
-npm install
-
-# 3. Inisialisasi database (akun default dibuat otomatis)
-npm run init-db
-
-# 4. Jalankan server
-npm start
+npm install      # sekali saja
+npm start        # buka http://localhost:3000
 ```
 
-Server juga otomatis menginisialisasi database saat pertama kali dijalankan.
+Database + akun default dibuat otomatis saat pertama kali dijalankan.
 
-Buka browser → **http://localhost:3000**
+### Windows (klik dua kali)
+1. Install Node.js dari [nodejs.org](https://nodejs.org)
+2. **Klik dua kali `start.bat`** (menjalankan `npm install` bila perlu, lalu memulai server)
+3. Buka **http://localhost:3000**
 
-### ▶️ Cara Menjalankan Gratis di Browser (GitHub Codespaces) — Tanpa Instalasi
-
-Tidak perlu install apa pun di komputer. Aplikasi jalan penuh di cloud GitHub dengan **database tersimpan**:
-
-1. Buka repo → https://github.com/dinothezero/Arsip-BPN
-2. Klik tombol hijau **Code ▾**
-3. Pilih tab **Codespaces**
-4. Klik **Create codespace on master**
-5. Tunggu beberapa saat — aplikasi otomatis ter-install & jalan
-6. Klik **Arsip BPN** pada panel *Ports* (port 3000) atau ikon browser di pojok → aplikasi terbuka
-
-> Data tidak hilang: database disimpan di disk workspace dan tetap ada saat Codespace dibuka kembali (bila tidak dihapus). Akun & semua data yang Anda ubah akan tersimpan.
-
-Gratis (dalam kuota bulanan GitHub pribadi) — tanpa kartu kredit, tanpa akun tambahan.
-
-### 🌐 Jalankan Online Sekaligus — GitHub Pages (Tanpa Server, Tanpa Instalasi)
-
-Versi **statis** aplikasi juga sudah tersedia langsung online — tidak butuh server, tidak butuh install apa pun:
-
-1. Buka → **https://dinothezero.github.io/Arsip-BPN/**
-2. Masuk dengan akun default: `admin/admin123` (atau `kepala/kepala123`)
-3. Semua menu (surat, arsip, sertifikat, laporan, pengaturan) berfungsi penuh termasuk **tambah/edit/hapus akun pengguna**
-
-> ⚠️ **Cara penyimpanan data:** versi GitHub Pages menyimpan data di **LocalStorage browser** (penyimpanan lokal per perangkat/browser). Data mengikuti browser tempat pemakaian — bukan database server bersama. Untuk data terpusat bersama (1 database untuk semua komputer), gunakan versi Codespaces / Node.js di atas.
+> Jalankan `npm run seed` untuk mengisi 8 arsip contoh (opsional). Hapus `data/arsip-bpn.db` untuk memulai dari nol.
 
 ### Akun Default
 
 | Role | Username | Password |
 |------|----------|----------|
 | Admin | `admin` | `admin123` |
-| Kepala | `kepala` | `kepala123` |
+| Staf | `staff1` | `password123` |
+| Kepala | `kepala1` | `password123` |
 
-> ⚠️ **Ubah password default setelah pemasangan!**
+> ⚠️ **Ubah password setelah pemasangan** (menu profil → Ganti Password).
 
 ## 🔧 Konfigurasi
 
 | Variable | Deskripsi |
 |----------|-----------|
 | `PORT` | Port server (default: `3000`) |
-| `SESSION_SECRET` | Secret key session (opsional) |
 
 ## 📁 Struktur Project
 
 ```
 arsip-bpn/
-├── server.js              # Entry point aplikasi
-├── database/
-│   ├── init.js            # Inisialisasi schema + akun default
-│   ├── db.js              # Helper koneksi node:sqlite
-│   └── arsip-bpn.db       # Database SQLite (generated)
-├── routes/                # Handler route tiap modul
-├── middleware/            # Auth + upload file
-├── views/                 # Template EJS
-├── public/                # CSS & JS statis
-├── static-site/           # Versi statis untuk GitHub Pages (LocalStorage)
-├── uploads/               # File upload (surat/arsip/sertifikat)
-└── backup/                # Hasil backup database
+├── start.bat            # Jalankan di Windows (klik dua kali)
+├── src/
+│   ├── server.js        # Entry point server
+│   ├── db/              # Koneksi, skema, query, seed contoh
+│   └── routes/          # API REST
+├── public/
+│   ├── index.html       # SPA shell
+│   ├── css/ style.css   # Tampilan
+│   ├── js/ app.js, views.js, api.js, ui.js
+│   ├── fonts/           # Font offline (Lora, Plus Jakarta Sans)
+│   └── vendor/chart.js  # Chart.js lokal (offline)
+├── data/                # Database + upload (dibuat otomatis, tidak di-git)
+│   ├── arsip-bpn.db
+│   ├── uploads/
+│   └── .session-secret
+└── static-site/         # Demo statis lama (GitHub Pages) — dibiarkan
 ```
 
 ## 📌 Catatan Penting
 
-- **Zero cost** — semua library open source & gratis
-- **File upload** tersimpan lokal di folder `uploads/` (maks. 20MB per file)
-- **Backup otomatis direkomendasikan** — jalankan menu *Pengaturan → Backup Database* secara berkala
-- Untuk produksi LAN kantor: jalankan `npm start` pada PC server, akses dari PC lain via IP LAN
+- **Zero cost & offline** — semua library disertakan, tidak butuh internet saat dijalankan
+- **File upload** tersimpan di `data/uploads/` — sertakan folder `data/` saat backup manual
+- **Backup database** — gunakan menu *Laporan & Ekspor → Backup*
+- **Untuk LAN kantor**: jalankan di satu PC server, kemudian akses dari PC lain via alamat IP LAN PC tersebut (contoh `http://192.168.1.10:3000`)
+- Versi demo statis lama tetap tersedia online di **https://dinothezero.github.io/Arsip-BPN/** (menyimpan data di LocalStorage browser) — bukan untuk data resmi kantor
 
 ---
-
 Dibuat untuk kebutuhan Kantor Pertanahan 😊

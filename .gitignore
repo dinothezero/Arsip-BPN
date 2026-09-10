@@ -1,9 +1,5 @@
 node_modules/
-database/*.db
-database/*.db-wal
-database/*.db-shm
-uploads/
-backup/
-.env
+data/
 *.log
 .DS_Store
+.env
