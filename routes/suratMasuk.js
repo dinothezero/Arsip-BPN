@@ -62,7 +62,7 @@ router.get('/', (req, res) => {
   const statusList = ['Baru', 'Diproses', 'Selesai', 'Diteruskan'];
 
   res.render('surat-masuk/index', {
-    title: 'Surat Masuk - Sistem Arsip BPN',
+    title: 'Surat Masuk - Arsip BPN',
     surat,
     kategoriList,
     statusList,
@@ -76,7 +76,7 @@ router.get('/create', (req, res) => {
   const nomorAgenda = generateNomorAgenda();
 
   res.render('surat-masuk/create', {
-    title: 'Tambah Surat Masuk - Sistem Arsip BPN',
+    title: 'Tambah Surat Masuk - Arsip BPN',
     kategoriList,
     users,
     nomorAgenda

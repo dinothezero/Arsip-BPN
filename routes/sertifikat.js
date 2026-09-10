@@ -46,7 +46,7 @@ router.get('/', (req, res) => {
   const kecamatanList = db.prepare('SELECT DISTINCT kecamatan FROM sertifikat WHERE kecamatan IS NOT NULL ORDER BY kecamatan').all();
 
   res.render('sertifikat/index', {
-    title: 'Sertifikat Tanah - Sistem Arsip BPN',
+    title: 'Sertifikat Tanah - Arsip BPN',
     sertifikat,
     jenisList,
     statusList,
@@ -57,7 +57,7 @@ router.get('/', (req, res) => {
 
 router.get('/create', (req, res) => {
   res.render('sertifikat/create', {
-    title: 'Tambah Sertifikat - Sistem Arsip BPN'
+    title: 'Tambah Sertifikat - Arsip BPN'
   });
 });
 

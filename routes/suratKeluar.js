@@ -50,7 +50,7 @@ router.get('/', (req, res) => {
   const statusList = ['Draft', 'Disetujui', 'Dikirim', 'Selesai'];
 
   res.render('surat-keluar/index', {
-    title: 'Surat Keluar - Sistem Arsip BPN',
+    title: 'Surat Keluar - Arsip BPN',
     surat,
     kategoriList,
     statusList,
@@ -63,7 +63,7 @@ router.get('/create', (req, res) => {
   const pengaturan = db.prepare('SELECT * FROM pengaturan LIMIT 1').get();
 
   res.render('surat-keluar/create', {
-    title: 'Tambah Surat Keluar - Sistem Arsip BPN',
+    title: 'Tambah Surat Keluar - Arsip BPN',
     kategoriList,
     pengaturan
   });

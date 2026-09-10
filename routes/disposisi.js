@@ -47,7 +47,7 @@ router.get('/', (req, res) => {
   const prioritasList = ['Segera', 'Penting', 'Biasa'];
 
   res.render('disposisi/index', {
-    title: 'Disposisi Surat - Sistem Arsip BPN',
+    title: 'Disposisi Surat - Arsip BPN',
     disposisi,
     statusList,
     prioritasList,

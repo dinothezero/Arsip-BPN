@@ -48,7 +48,7 @@ router.get('/', isAdmin, (req, res) => {
   const moduls = db.prepare('SELECT DISTINCT modul FROM log_aktivitas WHERE modul IS NOT NULL ORDER BY modul').all();
 
   res.render('logs/index', {
-    title: 'Log Aktivitas - Sistem Arsip BPN',
+    title: 'Log Aktivitas - Arsip BPN',
     logs,
     users,
     moduls,

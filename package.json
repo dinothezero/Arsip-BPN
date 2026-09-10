@@ -1,7 +1,7 @@
 {
-  "name": "bpn-arsip",
+  "name": "arsip-bpn",
   "version": "1.0.0",
-  "description": "Sistem Arsip Digital - Badan Pertanahan Nasional",
+  "description": "Arsip BPN - Sistem Arsip Digital Badan Pertanahan Nasional",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

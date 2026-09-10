@@ -60,7 +60,7 @@ router.get('/', (req, res) => {
   const tahunList = db.prepare('SELECT DISTINCT tahun FROM arsip_dokumen WHERE tahun IS NOT NULL ORDER BY tahun DESC').all();
 
   res.render('arsip/index', {
-    title: 'Arsip Dokumen - Sistem Arsip BPN',
+    title: 'Arsip Dokumen - Arsip BPN',
     arsip,
     statusList,
     kategoriList: KATEGORI_ARSIP,
@@ -79,7 +79,7 @@ router.get('/create', (req, res) => {
   const kodeSaran = `ARS-${String(nextNumber).padStart(4, '0')}-${new Date().getFullYear()}`;
 
   res.render('arsip/create', {
-    title: 'Tambah Arsip - Sistem Arsip BPN',
+    title: 'Tambah Arsip - Arsip BPN',
     kategoriList: KATEGORI_ARSIP,
     kodeSaran
   });

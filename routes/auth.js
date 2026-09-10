@@ -10,7 +10,7 @@ router.get('/login', (req, res) => {
   if (req.session.user) return res.redirect('/dashboard');
   res.render('auth/login', {
     layout: false,
-    title: 'Login - Sistem Arsip BPN',
+    title: 'Login - Arsip BPN',
     error: null
   });
 });
@@ -21,7 +21,7 @@ router.post('/login', (req, res) => {
   if (!username || !password) {
     return res.status(400).render('auth/login', {
       layout: false,
-      title: 'Login - Sistem Arsip BPN',
+      title: 'Login - Arsip BPN',
       error: 'Username dan password wajib diisi!'
     });
   }
@@ -31,7 +31,7 @@ router.post('/login', (req, res) => {
   if (!user || !bcrypt.compareSync(password, user.password)) {
     return res.status(401).render('auth/login', {
       layout: false,
-      title: 'Login - Sistem Arsip BPN',
+      title: 'Login - Arsip BPN',
       error: 'Username atau password salah!'
     });
   }
@@ -40,7 +40,7 @@ router.post('/login', (req, res) => {
     if (err) {
       return res.status(500).render('auth/login', {
         layout: false,
-        title: 'Login - Sistem Arsip BPN',
+        title: 'Login - Arsip BPN',
         error: 'Terjadi kesalahan pada server'
       });
     }

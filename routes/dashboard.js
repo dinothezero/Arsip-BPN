@@ -72,7 +72,7 @@ router.get('/', (req, res) => {
   `).all();
 
   res.render('dashboard/index', {
-    title: 'Dashboard - Sistem Arsip BPN',
+    title: 'Dashboard - Arsip BPN',
     stats: {
       totalSuratMasuk,
       totalSuratKeluar,

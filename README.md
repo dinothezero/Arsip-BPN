@@ -1,4 +1,4 @@
-# 📁 Sistem Arsip Digital BPN
+# 📁 Arsip BPN
 
 Sistem pengelolaan arsip digital lengkap untuk **Kantor Pertanahan / Badan Pertanahan Nasional (BPN)**. Dibangun sebagai *full-stack web application* dengan stack 100% gratis (zero cost).
 
@@ -21,21 +21,21 @@ Sistem pengelolaan arsip digital lengkap untuk **Kantor Pertanahan / Badan Perta
 ## 🛠️ Teknologi (Semua Gratis)
 
 - **Backend**: Node.js + Express.js
-- **Database**: SQLite (`better-sqlite3`) — tanpa server, file lokal
+- **Database**: SQLite (`node:sqlite`) — tanpa server, tanpa native compile, file lokal
 - **Template**: EJS dengan Tailwind CSS
 - **Chart**: Chart.js
-- **Session**: express-session + connect-sqlite3
+- **Session**: express-session + MemoryStore
 - **Password**: bcryptjs (hashing)
 
 ## 🚀 Cara Menjalankan
 
 ### Prasyarat
-- **Node.js** versi 18+ → unduh gratis di [nodejs.org](https://nodejs.org)
+- **Node.js** versi 22.5+ (mendukung `node:sqlite`) → unduh gratis di [nodejs.org](https://nodejs.org)
 
 ### Langkah
 ```bash
 # 1. Masuk ke folder project
-cd bpn-arsip
+cd arsip-bpn
 
 # 2. Install dependencies
 npm install
@@ -46,6 +46,8 @@ npm run init-db
 # 4. Jalankan server
 npm start
 ```
+
+Server juga otomatis menginisialisasi database saat pertama kali dijalankan.
 
 Buka browser → **http://localhost:3000**
 
@@ -68,11 +70,12 @@ Buka browser → **http://localhost:3000**
 ## 📁 Struktur Project
 
 ```
-bpn-arsip/
+arsip-bpn/
 ├── server.js              # Entry point aplikasi
 ├── database/
 │   ├── init.js            # Inisialisasi schema + akun default
-│   └── bpn-arsip.db       # Database SQLite (generated)
+│   ├── db.js              # Helper koneksi node:sqlite
+│   └── arsip-bpn.db       # Database SQLite (generated)
 ├── routes/                # Handler route tiap modul
 ├── middleware/            # Auth + upload file
 ├── views/                 # Template EJS

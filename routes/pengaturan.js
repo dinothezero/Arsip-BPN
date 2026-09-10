@@ -16,7 +16,7 @@ router.get('/', isAdmin, (req, res) => {
   const kategori = db.prepare('SELECT * FROM kategori_surat ORDER BY nama_kategori').all();
 
   res.render('pengaturan/index', {
-    title: 'Pengaturan - Sistem Arsip BPN',
+    title: 'Pengaturan - Arsip BPN',
     pengaturan,
     users,
     kategori,
@@ -121,7 +121,7 @@ router.post('/backup', isAdmin, (req, res) => {
   if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir, { recursive: true });
   const backupPath = path.join(backupDir, `backup-${timestamp}.db`);
 
-  const dbPath = path.join(__dirname, '..', 'database', 'bpn-arsip.db');
+  const dbPath = path.join(__dirname, '..', 'database', 'arsip-bpn.db');
   if (fs.existsSync(dbPath)) {
     fs.copyFileSync(dbPath, backupPath);
   }

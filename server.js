@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'bpn-arsip-secret-key-2024',
+  secret: process.env.SESSION_SECRET || 'arsip-bpn-session-secret',
   resave: false,
   saveUninitialized: false,
   cookie: {

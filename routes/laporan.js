@@ -124,7 +124,7 @@ router.get('/', (req, res) => {
   dataLaporan.namaKantor = db.prepare('SELECT * FROM pengaturan LIMIT 1').get();
 
   res.render('laporan/index', {
-    title: 'Laporan - Sistem Arsip BPN',
+    title: 'Laporan - Arsip BPN',
     data: dataLaporan,
     filters: { jenis, dari, sampai }
   });
