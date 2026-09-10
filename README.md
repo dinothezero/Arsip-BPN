@@ -14,6 +14,7 @@ Sistem pengelolaan arsip digital lengkap untuk **Kantor Pertanahan / Badan Perta
 | 📜 **Sertifikat Tanah** | Data sertifikat (HM/HGB/HP/dll), NIK, luas, letak, letter C, status |
 | 📈 **Laporan** | Rekap tahun berjalan, laporan surat masuk/keluar/sertifikat/arsip, cetak |
 | 👥 **Manajemen User** | Peran admin / kepala / user, reset password, akun aktif/nonaktif |
+| 👤 **Profil & Keamanan** | Ubah profil & password sendiri (self-service), aktivitas dicatat |
 | 🗂️ **Kategori Surat** | Kelola kategori surat sesuai kebutuhan kantor |
 | 🛡️ **Log Aktivitas** | Rekam jejak seluruh aktivitas pengguna dengan filter & paginasi |
 | 💾 **Backup Database** | Backup manual database sekali klik |
