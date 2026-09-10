@@ -67,6 +67,16 @@ Tidak perlu install apa pun di komputer. Aplikasi jalan penuh di cloud GitHub de
 
 Gratis (dalam kuota bulanan GitHub pribadi) — tanpa kartu kredit, tanpa akun tambahan.
 
+### 🌐 Jalankan Online Sekaligus — GitHub Pages (Tanpa Server, Tanpa Instalasi)
+
+Versi **statis** aplikasi juga sudah tersedia langsung online — tidak butuh server, tidak butuh install apa pun:
+
+1. Buka → **https://dinothezero.github.io/Arsip-BPN/**
+2. Masuk dengan akun default: `admin/admin123` (atau `kepala/kepala123`)
+3. Semua menu (surat, arsip, sertifikat, laporan, pengaturan) berfungsi penuh termasuk **tambah/edit/hapus akun pengguna**
+
+> ⚠️ **Cara penyimpanan data:** versi GitHub Pages menyimpan data di **LocalStorage browser** (penyimpanan lokal per perangkat/browser). Data mengikuti browser tempat pemakaian — bukan database server bersama. Untuk data terpusat bersama (1 database untuk semua komputer), gunakan versi Codespaces / Node.js di atas.
+
 ### Akun Default
 
 | Role | Username | Password |
@@ -96,6 +106,7 @@ arsip-bpn/
 ├── middleware/            # Auth + upload file
 ├── views/                 # Template EJS
 ├── public/                # CSS & JS statis
+├── static-site/           # Versi statis untuk GitHub Pages (LocalStorage)
 ├── uploads/               # File upload (surat/arsip/sertifikat)
 └── backup/                # Hasil backup database
 ```
