@@ -1,6 +1,6 @@
 {
   "name": "arsip-bpn",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Sistem Arsip Digital Kantor Pertanahan - berjalan 100% lokal, tanpa biaya",
   "main": "src/server.js",
   "engines": {
@@ -20,6 +20,8 @@
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "multer": "^2.0.1",
-    "qrcode": "^1.5.4"
+    "pdfjs-dist": "^6.3.289",
+    "qrcode": "^1.5.4",
+    "tesseract.js": "^7.0.0"
   }
 }

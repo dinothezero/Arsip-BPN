@@ -3,6 +3,14 @@
 const bcrypt = require('bcryptjs');
 const { db } = require('./db');
 
+// Tambah kolom bila belum ada (migrasi ringan, tidak merusak data)
+function ensureColumn(table, column, ddl) {
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all();
+  if (!cols.some((c) => c.name === column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
+  }
+}
+
 function createTables() {
   db.exec(`
   CREATE TABLE IF NOT EXISTS pengaturan (
@@ -185,6 +193,83 @@ function createTables() {
   CREATE INDEX IF NOT EXISTS idx_peminjaman_arsip ON peminjaman(arsip_id);
   CREATE INDEX IF NOT EXISTS idx_kegiatan_tanggal ON kegiatan(tanggal);
   `);
+
+  // ---------- Upgrade skema ringan (v3) ----------
+  // Pengguna: email & telepon (untuk multi-akun yang lebih lengkap)
+  ensureColumn('users', 'email', 'email TEXT DEFAULT \'\'');
+  ensureColumn('users', 'telepon', 'telepon TEXT DEFAULT \'\'');
+
+  // Arsip: hasil OCR + tag pencarian
+  ensureColumn('arsip', 'ocr_text', 'ocr_text TEXT DEFAULT \'\'');
+  ensureColumn('arsip', 'tags', 'tags TEXT DEFAULT \'\'');
+  ensureColumn('arsip', 'ocr_bahasa', 'ocr_bahasa TEXT DEFAULT \'\'');
+  ensureColumn('arsip', 'ocr_updated_at', 'ocr_updated_at TEXT');
+  ensureColumn('arsip', 'is_scanned', 'is_scanned INTEGER NOT NULL DEFAULT 0');
+
+  // Riwayat pemindaian OCR per arsip
+  db.exec(`
+  CREATE TABLE IF NOT EXISTS arsip_scan (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    arsip_id INTEGER NOT NULL,
+    bahasa TEXT DEFAULT 'ind',
+    halaman INTEGER DEFAULT 1,
+    durasi_ms INTEGER DEFAULT 0,
+    teks TEXT DEFAULT '',
+    mode TEXT DEFAULT 'upload' CHECK (mode IN ('upload','rescan')),
+    created_by INTEGER,
+    created_at TEXT DEFAULT (datetime('now','localtime')),
+    FOREIGN KEY (arsip_id) REFERENCES arsip(id) ON DELETE CASCADE
+  );
+  `);
+
+  // Indeks teks-lengkap (FTS5) untuk pencarian pintar termasuk isi OCR.
+  // FTS5 tersedia di SQLite yang dibundel Node.js (node:sqlite).
+  const fts = db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='arsip_fts'`).get();
+  if (!fts) {
+    try {
+      db.exec(`
+      CREATE VIRTUAL TABLE arsip_fts USING fts5(
+        nomor_arsip, judul, perihal, keterangan, tags, ocr_text,
+        tokenize='unicode61'
+      );
+      `);
+    } catch (e) {
+      console.warn('[init] FTS5 tidak tersedia, pencarian teks penuh nonaktif:', e.message);
+    }
+  }
+
+  // Trigger sinkronisasi FTS (hanya jika tabel FTS berhasil dibuat)
+  // Dibuat ulang tiap boot agar definisi selalu versi terbaru.
+  const hasFts = db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='arsip_fts'`).get();
+  if (hasFts) {
+    db.exec('DROP TRIGGER IF EXISTS trg_arsip_fts_insert');
+    db.exec('DROP TRIGGER IF EXISTS trg_arsip_fts_update');
+    db.exec('DROP TRIGGER IF EXISTS trg_arsip_fts_delete');
+    db.exec(`
+    CREATE TRIGGER trg_arsip_fts_insert AFTER INSERT ON arsip BEGIN
+      INSERT INTO arsip_fts(rowid, nomor_arsip, judul, perihal, keterangan, tags, ocr_text)
+      VALUES (new.id, new.nomor_arsip, new.judul, new.perihal, new.keterangan, new.tags, new.ocr_text);
+    END;
+    CREATE TRIGGER trg_arsip_fts_update AFTER UPDATE ON arsip BEGIN
+      INSERT OR REPLACE INTO arsip_fts(rowid, nomor_arsip, judul, perihal, keterangan, tags, ocr_text)
+      VALUES (new.id, new.nomor_arsip, new.judul, new.perihal, new.keterangan, new.tags, new.ocr_text);
+    END;
+    CREATE TRIGGER trg_arsip_fts_delete AFTER DELETE ON arsip BEGIN
+      INSERT INTO arsip_fts(arsip_fts, rowid) VALUES ('delete', old.rowid);
+    END;
+    `);
+  }
+}
+
+// Bangun ulang indeks FTS dari data arsip (dipakai pasca-restore/migrasi)
+function rebuildFts() {
+  const hasFts = db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='arsip_fts'`).get();
+  if (!hasFts) return 0;
+  db.exec('DELETE FROM arsip_fts;');
+  const rows = db.prepare('SELECT id, nomor_arsip, judul, perihal, keterangan, tags, ocr_text FROM arsip').all();
+  const ins = db.prepare('INSERT INTO arsip_fts(rowid, nomor_arsip, judul, perihal, keterangan, tags, ocr_text) VALUES (?,?,?,?,?,?,?)');
+  for (const r of rows) ins.run(r.id, r.nomor_arsip, r.judul, r.perihal, r.keterangan, r.tags, r.ocr_text);
+  return rows.length;
 }
 
 function seedDefaults() {
@@ -229,8 +314,9 @@ function seedDefaults() {
 if (require.main === module) {
   createTables();
   seedDefaults();
+  rebuildFts();
   const t = db.prepare('SELECT COUNT(*) AS n FROM arsip').get().n;
-  console.log(`[init] Database siap. ${db.prepare('SELECT COUNT(*) AS n FROM users').get().n} pengguna, ${t} arsip.`);
+  console.log(`[init] Database siap. ${db.prepare('SELECT COUNT(*) AS n FROM users').get().n} pengguna, ${t} arsip, ${db.prepare("SELECT COUNT(*) AS n FROM arsip_fts").get().n} terindeks FTS.`);
 }
 
-module.exports = { createTables, seedDefaults };
+module.exports = { createTables, seedDefaults, rebuildFts };

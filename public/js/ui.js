@@ -31,6 +31,14 @@ const UI = (() => {
     return `${fmtDate(d)} ${h}:${m}`;
   }
   function fmtNumber(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  function humanBytes(b) {
+    const n = Number(b) || 0;
+    if (n < 1024) return n + ' B';
+    const u = ['KB', 'MB', 'GB', 'TB'];
+    let i = -1; let v = n;
+    while (v >= 1024 && i < u.length - 1) { v /= 1024; i++; }
+    return v.toFixed(v >= 100 ? 0 : 1) + ' ' + u[i];
+  }
   function relTime(d) {
     if (!d) return '-';
     const dt = new Date(d.indexOf('T') > -1 ? d : d.replace(' ', 'T'));
@@ -73,6 +81,6 @@ const UI = (() => {
     // jika FontAwesome gagal dimuat, gunakan emoji sederhana dari data
     return (elm) => elm;
   }
-  return { toast, toastError, fmtDate, fmtDateTime, fmtNumber, relTime, esc, badge, jenisArsip, statusArsip, iconOf };
+  return { toast, toastError, fmtDate, fmtDateTime, fmtNumber, humanBytes, relTime, esc, badge, jenisArsip, statusArsip, iconOf };
 })();
 window.UI = UI;

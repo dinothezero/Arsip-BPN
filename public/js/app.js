@@ -34,6 +34,7 @@ const App = {
   routes: {
     '/dashboard': { title: 'Dashboard', view: 'dashboard', ico: 'fa-gauge-high', crumb: 'Beranda' },
     '/arsip': { title: 'Arsip Dokumen', view: 'arsip', ico: 'fa-folder-open', crumb: 'Pengelolaan Arsip' },
+    '/cari': { title: 'Cari Isi Dokumen', view: 'cari', ico: 'fa-magnifying-glass', crumb: 'Pencarian Teks Penuh (OCR)' },
     '/arsip/trash': { title: 'Tempat Sampah', view: 'trash', ico: 'fa-trash-can', crumb: 'Arsip Terhapus' },
     '/disposisi': { title: 'Disposisi', view: 'disposisi', ico: 'fa-right-left', crumb: 'Pengelolaan' },
     '/peminjaman': { title: 'Peminjaman Arsip', view: 'peminjaman', ico: 'fa-hand-holding', crumb: 'Pengelolaan' },
@@ -41,6 +42,7 @@ const App = {
     '/kalender': { title: 'Kalender Kegiatan', view: 'kalender', ico: 'fa-calendar-days', crumb: 'Administrasi' },
     '/laporan': { title: 'Laporan & Ekspor', view: 'laporan', ico: 'fa-file-chart-column', crumb: 'Data & Ekspor' },
     '/master': { title: 'Master Data', view: 'master', ico: 'fa-database', crumb: 'Referensi', role: 'admin' },
+    '/database': { title: 'Database & Cadangan', view: 'database', ico: 'fa-database', crumb: 'Admin · Kelola Database', role: 'admin' },
     '/pengguna': { title: 'Manajemen Pengguna', view: 'pengguna', ico: 'fa-users', crumb: 'Administrasi', role: 'admin' },
     '/log': { title: 'Log Aktivitas', view: 'log', ico: 'fa-list-check', crumb: 'Audit', role: 'admin' },
     '/profil': { title: 'Profil Kantor & Kop Surat', view: 'profil', ico: 'fa-building-columns', crumb: 'Pengaturan', role: 'admin' },
@@ -82,7 +84,7 @@ const App = {
           <h1>Sistem Arsip<br>Kantor Pertanahan</h1>
           <p>Pengelolaan arsip surat, sertifikat, dan dokumen pertanahan secara digital. Berjalan <b>100% lokal</b> di komputer Anda, tanpa biaya dan tanpa internet.</p>
           <div class="feat-pills">
-            <span>CRUD Arsip</span><span>Disposisi</span><span>Peminjaman</span><span>Barcode / QR</span><span>Laporan &amp; Ekspor Excel</span><span>Backup JSON</span>
+            <span>Multi-Akun</span><span>Scan / OCR Dokumen</span><span>Cari Isi Dokumen</span><span>Disposisi</span><span>Peminjaman</span><span>QR Code</span><span>Kelola Database (DDL)</span><span>Backup &amp; Restore</span>
           </div>
         </div>
         <div class="login-card">
@@ -94,7 +96,7 @@ const App = {
             <div class="row" id="login-err" style="display:none;color:#b91c1c;font-size:13px;background:#fdecec;padding:10px 14px;border-radius:8px"></div>
             <div class="row mt-3"><button class="btn btn-primary btn-block" id="login-btn" type="submit"><i class="fas fa-right-to-bracket"></i> Masuk</button></div>
           </form>
-          <p class="text-center text-small text-muted mt-3">Kantor Pertanahan &middot; Sistem Arsip Digital &middot; v2.0</p>
+          <p class="text-center text-small text-muted mt-3">Kantor Pertanahan &middot; Sistem Arsip Digital &middot; v3.0</p>
         </div>
       </div>`;
   },
@@ -164,6 +166,7 @@ const App = {
       { href: '#/dashboard', ico: 'fa-gauge-high', label: 'Dashboard' },
       { label: 'PENGELOLAAN', sep: true, role: true },
       { href: '#/arsip', ico: 'fa-folder-open', label: 'Arsip Dokumen', role: true },
+      { href: '#/cari', ico: 'fa-magnifying-glass', label: 'Cari Isi Dokumen', role: true },
       { href: '#/disposisi', ico: 'fa-right-left', label: 'Disposisi', role: true },
       { href: '#/peminjaman', ico: 'fa-hand-holding', label: 'Peminjaman' },
       { href: '#/arsip/trash', ico: 'fa-trash-can', label: 'Tempat Sampah', admin: true },
@@ -175,6 +178,7 @@ const App = {
       ...(admin ? [
         { label: 'ADMIN', sep: true },
         { href: '#/master', ico: 'fa-database', label: 'Master Data' },
+        { href: '#/database', ico: 'fa-database', label: 'Database & Cadangan' },
         { href: '#/pengguna', ico: 'fa-users', label: 'Manajemen Pengguna' },
         { href: '#/log', ico: 'fa-list-check', label: 'Log Aktivitas' },
         { href: '#/profil', ico: 'fa-building-columns', label: 'Profil Kantor' },
@@ -231,6 +235,7 @@ const App = {
           </div>
           <div class="dropdown-menu hidden" id="user-menu">
             <div class="dm-head"><b>${UI.esc(name)}</b><span>${UI.esc(roleLbl)}</span></div>
+            <button onclick="App.modalProfilSaya()"><i class="fas fa-id-badge"></i> Ubah Profil Saya</button>
             <button onclick="App.openGantiPassword()"><i class="fas fa-key"></i> Ganti Password</button>
             <button onclick="App.logout()"><i class="fas fa-right-from-bracket" style="color:#dc2626"></i> Keluar</button>
           </div>
@@ -425,6 +430,11 @@ const App = {
             <div>
               <div class="kvp"><div class="k">Perihal</div><div class="v">${UI.esc(a.perihal || '-')}</div></div>
               ${a.file_path ? `<div class="mt-3"><a class="btn btn-primary btn-block" href="${API.download(a.id)}"><i class="fas fa-download"></i> Unduh Lampiran</a></div>` : `<div class="text-muted text-small mt-3"><i class="fas fa-circle-info"></i> Tidak ada lampiran</div>`}
+              <div class="mt-3 flex" style="gap:8px;align-items:center;flex-wrap:wrap">
+                <span class="badge ${a.is_scanned ? 'badge-green' : 'badge-gray'}"><i class="fas fa-scanner"></i> ${a.is_scanned ? 'Sudah di-OCR' : 'Belum di-OCR'}</span>
+                <button class="btn btn-ghost btn-sm" onclick="App.modalOcr(${a.id}, '${UI.esc(a.nomor_arsip)}')"><i class="fas fa-scanner"></i> Scan / OCR Dokumen</button>
+              </div>
+              ${a.ocr_text ? `<div class="ocr-mini"><b class="text-small"><i class="fas fa-file-lines"></i> Isi terdeteksi (OCR):</b><div>${UI.esc(String(a.ocr_text).slice(0, 260))}${a.ocr_text.length > 260 ? '…' : ''}</div><small class="text-muted">${a.ocr_bahasa ? 'Pdf bahasa: ' + UI.esc(a.ocr_bahasa) : ''}${a.ocr_updated_at ? ' · ' + UI.esc(a.ocr_updated_at) : ''}</small></div>` : ''}
               <div class="mt-4"><b class="text-small">Riwayat Disposisi</b>${a.disposisi_list.length ? a.disposisi_list.map((d) => `<div class="flex items-center gap-2 mt-2" style="gap:10px;background:var(--slate-50);padding:8px 12px;border-radius:8px"><i class="fas fa-right-left text-muted"></i><div class="text-small"><b>${UI.esc(d.dari_nama || '')}</b> → <b>${UI.esc(d.ke_nama || '')}</b><div class="text-muted">${UI.esc(d.instruksi || '')}</div></div><span class="badge ${d.status === 'selesai' ? 'badge-green' : d.status === 'ditolak' ? 'badge-red' : 'badge-gold'}">${d.status}</span></div>`).join('') : '<div class="empty" style="padding:18px">Belum ada disposisi</div>'}</div>
             </div>
           </div>`,
@@ -653,6 +663,33 @@ const App = {
 
   // ================= PROFIL & IMPORT =================
   async saveProfil(e) { e.preventDefault(); const b = Object.fromEntries(new FormData(document.getElementById('prof-form'))); try { await API.pengaturanUpdate(b); UI.toast('Profil kantor disimpan.'); } catch (err) { UI.toastError(err); } },
+  modalProfilSaya() {
+    const u = this.user;
+    Modal.open({
+      title: 'Ubah Profil Saya',
+      body: `<div class="text-muted text-small mb-3">Data ini tampil di daftar pengguna dan riwayat aktivitas Anda.</div>
+        <form id="me-form" onsubmit="return false">
+          <div class="form-row"><label>Nama Lengkap</label><input class="field" name="nama_lengkap" value="${UI.esc(u.nama_lengkap || '')}"></div>
+          <div class="form-2col">
+            <div class="form-row"><label>NIP</label><input class="field" name="nip" value="${UI.esc(u.nip || '')}"></div>
+            <div class="form-row"><label>Jabatan</label><input class="field" name="jabatan" value="${UI.esc(u.jabatan || '')}"></div>
+            <div class="form-row"><label>Email</label><input class="field" type="email" name="email" value="${UI.esc(u.email || '')}"></div>
+            <div class="form-row"><label>Telepon</label><input class="field" name="telepon" value="${UI.esc(u.telepon || '')}"></div>
+          </div>
+        </form>`,
+      footer: `<button class="btn btn-outline" onclick="Modal.close()">Batal</button><button class="btn btn-primary" onclick="App.saveProfilSaya()"><i class="fas fa-save"></i> Simpan</button>`,
+    });
+  },
+  async saveProfilSaya() {
+    const b = Object.fromEntries(new FormData(document.getElementById('me-form')));
+    try {
+      await API.profilSaya(b);
+      this.user = { ...this.user, ...b };
+      UI.toast('Profil Anda diperbarui.');
+      Modal.close();
+      this.renderTopbar();
+    } catch (e) { UI.toastError(e); }
+  },
   async importCSV(e) {
     e && e.preventDefault();
     const inp = e.target.querySelector('input[type=file]');
@@ -667,6 +704,62 @@ const App = {
       if (r.log && r.log.length) { UI.toast('Sebagian baris gagal: ' + r.log.slice(0, 3).join(' | '), 'error'); }
       Views.go('laporan', document.getElementById('content'));
     } catch (err) { Modal.close(); UI.toastError(err); }
+  },
+  // ================= IMPORT CSV (dari tombol halaman arsip) =================
+  modalImport() {
+    Modal.open({ title: 'Import CSV Massal', body: `<p class="text-muted text-small mb-3">Impor banyak arsip sekaligus dari berkas CSV dengan kolom: <b>Nomor Arsip; Judul; Perihal; Tanggal; Kategori; Jenis; Instansi; Lokasi; Status</b>.</p><label class="drop-zone"><input type="file" id="f-import" accept=".csv,.txt" onchange="App.doImportFromModal(this)"><i class="fas fa-cloud-arrow-up"></i> Pilih berkas CSV</label><div id="imp-stat" class="text-muted text-small mt-2"></div>`, footer: `<button class="btn btn-outline" onclick="Modal.close()">Batal</button>` });
+  },
+  async doImportFromModal(inp) {
+    if (!inp.files[0]) return;
+    const st = document.getElementById('imp-stat'); st.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+    const fd = new FormData(); fd.append('file', inp.files[0]);
+    try {
+      const r = await API.importCsv(fd);
+      st.innerHTML = `<span style="color:var(--hijau-700)">Selesai: ${r.sukses} berhasil, ${r.gagal} gagal.</span>`;
+      UI.toast(`Import selesai: ${r.sukses} berhasil, ${r.gagal} gagal.`, r.gagal ? 'error' : 'success');
+      setTimeout(() => { Modal.close(); Views.go('arsip', document.getElementById('content')); }, 900);
+    } catch (err) { st.innerHTML = '<span style="color:#dc2626">' + UI.esc(err.message) + '</span>'; }
+  },
+
+  // ================= OCR DOKUMEN =================
+  async modalOcr(id, nomor) {
+    const a = await API.arsipOcrGet(id).catch(() => ({ text: '', riwayat: [], arsip: {} }));
+    Modal.open({
+      title: 'Scan / OCR · ' + (nomor || 'Arsip'), lg: true,
+      body: `<div class="ocr-box">
+        <div class="ocr-ops">
+          <div class="form-row"><label>Sumber Gambar</label>
+            <div class="flex" style="gap:8px;flex-wrap:wrap">
+              <button class="btn btn-ghost btn-sm ocr-lamp" onclick="OCR.pakaiLampiran(${id})" ${a.arsip && a.arsip.id ? 'disabled' : ''}>${a.arsip && a.arsip.id ? '<i class="fas fa-check"></i> Lampiran arsip' : '<i class="fas fa-paperclip"></i> Pakai lampiran'}</button>
+              <label class="btn btn-outline btn-sm" style="cursor:pointer"><i class="fas fa-upload"></i> Upload gambar/PDF<input type="file" id="ocr-file" accept=".pdf,.jpg,.jpeg,.png,.webp,.bmp,.tif,.tiff,.txt,.csv" onchange="OCR.pakaiFile(this.files[0])" style="display:none"></label>
+            </div>
+          </div>
+          <div class="form-row"><label>Bahasa</label><select class="field" id="ocr-lang" style="max-width:220px"><option value="ind">Indonesia</option><option value="eng">Inggris</option><option value="ind+eng">Indonesia + Inggris</option></select></div>
+        </div>
+        <div class="ocr-preview" id="ocr-preview"><div class="empty" style="padding:30px"><i class="fas fa-scanner fa-2xl mb-2"></i><b>Pilih lampiran arsip atau upload dokumen</b><span>PDF akan dirender halaman demi halaman, lalu di-OCR otomatis di komputer ini (100% offline, tanpa biaya).</span></div></div>
+        <div class="ocr-progress hidden" id="ocr-progress"><div class="pr-bar"><div class="pr-fill" id="ocr-fill" style="width:0%"></div></div><div class="pr-txt" id="ocr-txt">0%</div></div>
+        <div class="form-row mt-3"><label>Hasil Teks (bisa diedit sebelum disimpan)</label><textarea class="field" id="ocr-result" rows="10" style="font-family:monospace;font-size:13px" placeholder="Hasil OCR akan tampil di sini...">${UI.esc(a.text || '')}</textarea></div>
+        <div class="text-muted text-small mt-2">${a.diperbarui ? 'Terakhir dipindai: ' + UI.fmtDateTime(a.diperbarui) : 'Belum pernah di-scan.'}${a.riwayat && a.riwayat.length ? ' · ' + a.riwayat.length + 'x pemindaian' : ''}</div>
+      </div>`,
+      footer: `<button class="btn btn-outline" onclick="Modal.close()">Tutup</button>${App.roleOf() === 'admin' ? `<button class="btn btn-ghost" onclick="App.reindexFts()"><i class="fas fa-sync"></i> Perbarui indeks</button>` : ''}<button class="btn btn-primary" id="ocr-save" onclick="App.saveOcr(${id}, '${nomor ? nomor.replace(/'/g, '') : ''}')"><i class="fas fa-save"></i> Simpan Hasil OCR</button>`,
+    });
+    Modal._ocrData = { text: a.text || '', arsip: a.arsip };
+    const t = new Date(); Modal._ocrStart = t;
+  },
+  async saveOcr(id, nomor) {
+    const text = (document.getElementById('ocr-result') || {}).value || '';
+    if (!text.trim()) return UI.toast('Teks hasil OCR kosong.', 'error');
+    const dur = Modal._ocrDur || 0;
+    const pg = Modal._ocrPages || 1;
+    try {
+      await API.arsipOcrSet(id, { text: text.trim(), bahasa: (document.getElementById('ocr-lang') || { value: 'ind' }).value, durasi_ms: dur, halaman: pg, mode: Modal._ocrMode || 'upload' });
+      UI.toast('Hasil OCR disimpan dan masuk pencarian isi dokumen.');
+      Modal.close();
+      if (location.hash.includes('arsip')) Views.go('arsip', document.getElementById('content'));
+    } catch (e) { UI.toastError(e); }
+  },
+  async reindexFts() {
+    try { const r = await API.reindex(); UI.toast(`Indeks diperbarui (${r.terindeks} arsip).`); } catch (e) { UI.toastError(e); }
   },
   modalCetak() { Views.modalCetak(); },
 };

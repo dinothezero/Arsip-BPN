@@ -11,6 +11,7 @@ function requireAuth(req, res, next) {
     const user = Q.findUserById(req.session.userId);
     if (user && user.status === 1) {
       req.user = user;
+      Q.markOnline(user.id);
       return next();
     }
     req.session.destroy(() => { res.status(401).json({ error: 'Sesi tidak valid atau akun nonaktif.' }); });

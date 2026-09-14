@@ -102,6 +102,28 @@ const API = (() => {
     exportCsv: (q) => '/api/laporan/export-csv' + (q || ''),
     exportXlsx: (q) => '/api/laporan/export-xlsx' + (q || ''),
     backup: () => '/api/laporan/backup',
+    // profil sendiri (multi-akun)
+    profilSaya: (b) => put('/api/auth/profil', b),
+    // OCR
+    arsipOcrGet: (id) => get('/api/arsip/' + id + '/ocr'),
+    arsipOcrSet: (id, b) => post('/api/arsip/' + id + '/ocr', b),
+    reindex: () => post('/api/arsip/reindex', {}),
+    // pencarian teks penuh lintas isi + hasil OCR
+    search: (q) => get('/api/search?q=' + encodeURIComponent(q) + '&limit=50'),
+    // pengelolaan database (admin)
+    dbInfo: () => get('/api/db'),
+    dbTable: (name, qsv) => get('/api/db/table/' + encodeURIComponent(name) + (qsv ? '?' + qsv : '')),
+    dbQuery: (sql, mode) => post('/api/db/query', { sql, mode }),
+    dbRowInsert: (name, data) => post('/api/db/table/' + encodeURIComponent(name) + '/row', { data }),
+    dbRowUpdate: (name, pk, data) => put('/api/db/table/' + encodeURIComponent(name) + '/row', { pk, data }),
+    dbRowDelete: (name, pk) => request('DELETE', '/api/db/table/' + encodeURIComponent(name) + '/row', { pk }),
+    dbBackup: () => post('/api/db/backup', {}),
+    dbBackups: () => get('/api/db/backups'),
+    dbBackupFile: (f) => '/api/db/backups/' + encodeURIComponent(f),
+    dbIntegrity: () => post('/api/db/integrity', {}),
+    dbVacuum: () => post('/api/db/vacuum', {}),
+    dbDownload: () => '/api/db/download',
+    dbRestore: (fd) => post('/api/db/restore', fd),
   };
 })();
 window.API = API;

@@ -62,6 +62,28 @@ const Views = (() => {
       ${pageHead(`${greet}, ${UI.esc(name)}`, 'Berikut ringkasan pengelolaan arsip kantor Anda.')}
       <div class="stats-grid">${statCards}</div>
 
+      <div class="grid" style="grid-template-columns:1.4fr 1fr;margin-bottom:20px">
+        <div class="card">
+          <div class="card-head"><h3><i class="fas fa-database text-emas mr-1"></i>Penyimpanan &amp; Database</h3><a href="#/database" class="text-small" data-role="admin">Kelola <i class="fas fa-arrow-right"></i></a></div>
+          <div class="card-pad">
+            <div class="mini-stats">
+              ${[['Arsip', d.storage && d.storage.total_arsip, 'fa-folder-open', 'ic-teal'], ['Sudah di-OCR', d.storage && d.storage.sudah_ocr, 'fa-scanner', 'ic-green'], ['Belum di-OCR', d.storage && d.storage.belum_ocr, 'fa-file-lines', 'ic-gold'], ['Pemindaian', d.storage && d.storage.total_pindai, 'fa-clock-rotate-left', 'ic-blue']].map((x) => `<div class="mini"><div class="mi-icon ${x[3]}"><i class="fas ${x[2]}"></i></div><div class="mi-v">${UI.fmtNumber(x[1] || 0)}</div><div class="mi-l">${x[0]}</div></div>`).join('')}
+            </div>
+            <div class="flex justify-between mt-3 text-small text-muted" style="padding-top:10px;border-top:1px solid var(--slate-200)">
+              <span><i class="fas fa-hard-drive"></i> Database: ${UI.humanBytes(d.storage ? d.storage.db_bytes : 0)}</span>
+              <span><i class="fas fa-paperclip"></i> Lampiran: ${UI.humanBytes(d.storage ? d.storage.file_bytes : 0)} (${d.storage ? d.storage.file_konten : 0} berkas)</span>
+              <span><i class="fas fa-user-check"></i> Pengguna aktif: ${UI.fmtNumber(d.storage ? d.storage.total_user : 0)}</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3><i class="fas fa-clock-rotate-left text-emas mr-1"></i>Arsip Terbaru</h3></div>
+          <div class="card-body">
+            ${(d.recent || []).length ? d.recent.map((r2) => `<div class="flex items-center justify-between mb-2" style="gap:10px;padding:9px 12px;background:var(--slate-50);border-radius:10px"><div style="min-width:0"><div class="text-small" style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${UI.esc(r2.nomor_arsip)}</div><div class="text-muted text-small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${UI.esc(r2.judul)}</div></div><button class="icon-btn" title="Buka" onclick="App.modalDetail(${r2.id})"><i class="fas fa-eye"></i></button></div>`).join('') : '<div class="empty"><i class="fas fa-folder-open"></i><b>Belum ada arsip</b></div>'}
+          </div>
+        </div>
+      </div>
+
       <div class="grid grid-3" style="margin-bottom:20px">
         <div class="card" style="grid-column:span 2">
           <div class="card-head"><h3><i class="fas fa-chart-line text-emas mr-1"></i>Tren Arsip 12 Bulan Terakhir</h3><span class="badge badge-green">bulanan</span></div>
@@ -171,6 +193,7 @@ const Views = (() => {
       k.status ? 'status=' + k.status : '',
       k.kategori ? 'kategori_id=' + k.kategori : '',
       k.instansi ? 'instansi_id=' + k.instansi : '',
+      k.ocr ? 'ocr=' + k.ocr : '',
       'limit=50', 'offset=' + ((k.page - 1) * 50),
     ].filter(Boolean).join('&');
     let r = { total: 0, rows: [] };
@@ -186,11 +209,12 @@ const Views = (() => {
         <select class="field" onchange="storeAs('status',this.value)"><option value="">Semua Status</option><option value="aktif" ${k.status === 'aktif' ? 'selected' : ''}>Aktif</option><option value="arsip" ${k.status === 'arsip' ? 'selected' : ''}>Arsip</option><option value="dipinjam" ${k.status === 'dipinjam' ? 'selected' : ''}>Dipinjam</option><option value="hilang" ${k.status === 'hilang' ? 'selected' : ''}>Hilang</option><option value="rusak" ${k.status === 'rusak' ? 'selected' : ''}>Rusak</option></select>
         <select class="field" onchange="storeAs('kategori',this.value)">${opts(kats)}</select>
         <select class="field" onchange="storeAs('instansi',this.value)">${opts(insts)}</select>
-        <button class="btn btn-ghost btn-sm" onclick="resetArsipFilter()" ${k.query || k.jenis || k.status || k.kategori || k.instansi ? '' : 'disabled'}><i class="fas fa-rotate-left"></i> Reset</button>
+        <select class="field" onchange="storeAs('ocr',this.value)"><option value="">Semua Status OCR</option><option value="sudah" ${k.ocr === 'sudah' ? 'selected' : ''}>Sudah di-OCR</option><option value="belum" ${k.ocr === 'belum' ? 'selected' : ''}>Belum di-OCR</option></select>
+        <button class="btn btn-ghost btn-sm" onclick="resetArsipFilter()" ${k.query || k.jenis || k.status || k.kategori || k.instansi || k.ocr ? '' : 'disabled'}><i class="fas fa-rotate-left"></i> Reset</button>
       </div>
       <div class="card">
         <div class="table-wrap"><table class="tbl">
-          <thead><tr><th>#</th><th>Nomor Arsip</th><th>Judul / Perihal</th><th>Jenis</th><th>Kategori</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead>
+          <thead><tr><th>#</th><th>Nomor Arsip</th><th>Judul / Perihal</th><th>Jenis</th><th>Kategori</th><th>Tanggal</th><th>Status</th><th>OCR</th><th>Aksi</th></tr></thead>
           <tbody>${renderArsipRows(r.rows, (k.page - 1) * 50)}</tbody>
         </table></div>
         ${totalPages > 1 ? `<div class="pagination">Halaman ${k.page}/${totalPages} <button ${k.page <= 1 ? 'disabled' : ''} onclick="pageArsip(${k.page - 1})"><i class="fas fa-chevron-left"></i></button><button ${k.page >= totalPages ? 'disabled' : ''} onclick="pageArsip(${k.page + 1})"><i class="fas fa-chevron-right"></i></button></div>` : ''}
@@ -198,16 +222,17 @@ const Views = (() => {
     el.querySelectorAll('[data-role]').forEach((n) => { if (App.roleOf() !== 'admin') n.style.display = 'none'; });
   }
   function renderArsipRows(rows, base) {
-    if (!rows || !rows.length) return `<tr><td colspan="8"><div class="empty"><i class="fas fa-folder-open"></i><b>Belum ada arsip</b>Klik "Tambah Arsip" untuk membuat data pertama.</div></td></tr>`;
+    if (!rows || !rows.length) return `<tr><td colspan="9"><div class="empty"><i class="fas fa-folder-open"></i><b>Belum ada arsip</b>Klik "Tambah Arsip" untuk membuat data pertama.</div></td></tr>`;
     return rows.map((a, i) => `
       <tr>
         <td class="row-num">${base + i + 1}</td>
         <td class="wrap-main"><a class="link-arsip" onclick="App.modalDetail(${a.id})">${UI.esc(a.nomor_arsip)}</a><div class="wrap-sub">${a.kode_kategori ? UI.esc(a.kode_kategori) : '-'}</div></td>
-        <td><div class="wrap-main">${UI.esc(a.judul)}</div>${a.perihal ? `<div class="wrap-sub">${UI.esc(a.perihal)}</div>` : ''}</td>
+        <td><div class="wrap-main">${UI.esc(a.judul)}</div>${a.perihal ? `<div class="wrap-sub">${UI.esc(a.perihal)}</div>` : ''}${a.ocr_preview ? `<div class="wrap-sub ocr-prev"><i class="fas fa-scanner"></i> ${UI.esc(a.ocr_preview)}…</div>` : ''}</td>
         <td>${jenisBadge(a.jenis)}</td>
         <td>${a.nama_kategori ? UI.esc(a.nama_kategori) : '-'}</td>
         <td>${a.tanggal ? UI.fmtDate(a.tanggal) : '-'}</td>
         <td>${statusBadge(a.status)}</td>
+        <td><div class="flex" style="gap:4px;align-items:center">${a.has_ocr ? '<span class="badge badge-green" title="Isi sudah terbaca"><i class="fas fa-scanner"></i> OCR</span>' : ''}<button class="icon-btn" title="Scan / OCR dokumen" onclick="App.modalOcr(${a.id}, '${UI.esc(a.nomor_arsip)}')"><i class="fas fa-file-lines"></i></button></div></td>
         <td><div class="flex" style="gap:4px">
           <button class="icon-btn" title="Detail" onclick="App.modalDetail(${a.id})"><i class="fas fa-eye"></i></button>
           ${a.file_path ? `<a class="icon-btn" title="Unduh lampiran" href="${API.download(a.id)}"><i class="fas fa-paperclip"></i></a>` : ''}
@@ -543,6 +568,8 @@ const Views = (() => {
     switch (view) {
       case 'dashboard': return renderDashboard(el);
       case 'arsip': return renderArsip(el);
+      case 'cari': return window.SearchView ? SearchView.render(el) : renderDashboard(el);
+      case 'database': return window.DBView ? DBView.render(el) : renderDashboard(el);
       case 'trash': return renderTrash(el);
       case 'disposisi': return renderDisposisi(el);
       case 'peminjaman': return renderPeminjaman(el);
@@ -569,10 +596,10 @@ window.Views = Views;
 let _deb;
 function debounce(fn, ms) { clearTimeout(_deb); _deb = setTimeout(fn, ms || 450); }
 function store(section, key, val) { const o = Views.store[section] || (Views.store[section] = {}); o[key] = val; }
-function storeAs(key, val) { store('arsip', key, val); Views.renderArsip(); }
-function resetArsipFilter() { store('arsip', 'query', ''); store('arsip', 'page', 1); store('arsip', 'jenis', ''); store('arsip', 'status', ''); store('arsip', 'kategori', ''); store('arsip', 'instansi', ''); Views.renderArsip(); }
-function pageArsip(p) { store('arsip', 'page', p); Views.renderArsip(); }
-function refreshArsip() { Views.store.arsip.page = 1; Views.renderArsip(); }
+function storeAs(key, val) { store('arsip', key, val); Views.renderArsip(document.getElementById('content')); }
+function resetArsipFilter() { store('arsip', 'query', ''); store('arsip', 'page', 1); store('arsip', 'jenis', ''); store('arsip', 'status', ''); store('arsip', 'kategori', ''); store('arsip', 'instansi', ''); store('arsip', 'ocr', ''); Views.renderArsip(document.getElementById('content')); }
+function pageArsip(p) { store('arsip', 'page', p); Views.renderArsip(document.getElementById('content')); }
+function refreshArsip() { Views.store.arsip.page = 1; Views.renderArsip(document.getElementById('content')); }
 function dispFilter(v) { store('disposisi', 'filter', v); Views.go('disposisi', document.getElementById('content')); }
 function pinjamFilter(v) { store('peminjaman', 'filter', v); Views.go('peminjaman', document.getElementById('content')); }
 function agendaTahun(v) { store('agenda', 'tahun', v); Views.go('agenda', document.getElementById('content')); }

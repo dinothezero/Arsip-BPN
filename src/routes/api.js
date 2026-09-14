@@ -8,12 +8,13 @@ const multer = require('multer');
 const QRCode = require('qrcode');
 
 const Q = require('../db/queries');
-const { db, UPLOAD_DIR } = require('../db/db');
+const { db, UPLOAD_DIR, BACKUP_DIR } = require('../db/db');
 const { requireAuth, requireRole, logAction, bcrypt } = require('../middleware/auth');
 
 const router = express.Router();
 
 const ALLOWED_EXT = ['.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx', '.xls', '.xlsx', '.txt', '.csv', '.zip'];
+const RESTORE_EXT = ['.json', '.db', '.sql'];
 
 const storage = multer.diskStorage({
   destination(req, file, cb) { cb(null, UPLOAD_DIR); },
@@ -28,6 +29,7 @@ function fileFilter(req, file, cb) {
   else cb(new Error('Tipe berkas tidak diizinkan.'));
 }
 const upload = multer({ storage, fileFilter, limits: { fileSize: 50 * 1024 * 1024 } });
+const uploadAny = multer({ storage, limits: { fileSize: 200 * 1024 * 1024 } });
 
 const pick = (o, keys) => { const r = {}; for (const k of keys) if (o[k] !== undefined) r[k] = o[k]; return r; };
 
@@ -54,7 +56,7 @@ router.post('/auth/logout', requireAuth, (req, res) => {
 
 router.get('/auth/me', requireAuth, (req, res) => {
   res.json({
-    user: { id: req.user.id, username: req.user.username, nama_lengkap: req.user.nama_lengkap, nip: req.user.nip, jabatan: req.user.jabatan, role: req.user.role },
+    user: { id: req.user.id, username: req.user.username, nama_lengkap: req.user.nama_lengkap, nip: req.user.nip, jabatan: req.user.jabatan, email: req.user.email, telepon: req.user.telepon, role: req.user.role },
     belumBaca: Q.countBelumBaca(req.user.id) + Q.countDisposisiBelumBaca(req.user.id),
   });
 });
@@ -66,6 +68,14 @@ router.post('/auth/ganti-password', requireAuth, (req, res) => {
   if (String(password_baru).length < 6) return res.status(400).json({ error: 'Password baru minimal 6 karakter.' });
   Q.setPassword(req.user.id, bcrypt.hashSync(String(password_baru), 10));
   logAction(req.user, 'GANTI PASSWORD', 'auth', '');
+  res.json({ ok: true });
+});
+
+// Ubah profil akun sendiri (multi-akun: tiap orang lengkapi identitasnya)
+router.put('/auth/profil', requireAuth, (req, res) => {
+  const b = req.body || {};
+  Q.updateProfil(req.user.id, { nama_lengkap: b.nama_lengkap, nip: b.nip, jabatan: b.jabatan, email: b.email, telepon: b.telepon });
+  logAction(req.user, 'UBAH PROFIL SENDIRI', 'auth', '');
   res.json({ ok: true });
 });
 
@@ -194,6 +204,55 @@ router.get('/arsip/:id/qr', requireAuth, (req, res) => {
     .catch(() => res.status(500).json({ error: 'Gagal membuat QR.' }));
 });
 
+// ================= OCR DOKUMEN (scan di browser, simpan di server) =================
+router.get('/arsip/:id/ocr', requireAuth, (req, res) => {
+  const a = Q.getArsip(req.params.id);
+  if (!a) return res.status(404).json({ error: 'Arsip tidak ditemukan.' });
+  res.json({ text: Q.getArsipOcr(a.id), bahasa: a.ocr_bahasa || '', diperbarui: a.ocr_updated_at || null, riwayat: Q.listScanHistory(a.id), arsip: { id: a.id, nomor_arsip: a.nomor_arsip, judul: a.judul } });
+});
+
+router.post('/arsip/:id/ocr', requireAuth, (req, res) => {
+  const a = Q.getArsip(req.params.id);
+  if (!a) return res.status(404).json({ error: 'Arsip tidak ditemukan.' });
+  const text = typeof req.body.text === 'string' ? req.body.text : '';
+  if (!text.trim()) return res.status(400).json({ error: 'Teks hasil OCR kosong.' });
+  const n = Q.setArsipOcr(a.id, {
+    text,
+    bahasa: req.body.bahasa || 'ind',
+    durasi_ms: Number(req.body.durasi_ms) || 0,
+    halaman: Number(req.body.halaman) || 1,
+    mode: req.body.mode === 'rescan' ? 'rescan' : 'upload',
+    byUserId: req.user.id,
+  });
+  logAction(req.user, 'SIMPAN OCR', 'ocr', `${a.nomor_arsip} (${n} karakter)`);
+  res.json({ ok: true, karakter: n });
+});
+
+// Bangun ulang indeks pencarian teks penuh (dipakai setelah restore/migrasi)
+router.post('/arsip/reindex', requireAuth, requireRole('admin'), (req, res) => {
+  const { rebuildFts } = require('../db/init');
+  const n = rebuildFts();
+  logAction(req.user, 'REINDEKS FTS', 'sistem', `${n} arsip`);
+  res.json({ ok: true, terindeks: n });
+});
+
+// Pencarian teks penuh lintas seluruh isi arsip + hasil OCR
+router.get('/search', requireAuth, (req, res) => {
+  const q = String(req.query.q || '').trim();
+  if (!q) return res.json({ ok: true, rows: [], total: 0 });
+  if (Q.ftsAvailable()) {
+    return res.json(Q.searchFullText(q, req.query.limit));
+  }
+  // Fallback bila FTS tidak tersedia
+  const rows = db.prepare(`
+    SELECT a.id, a.nomor_arsip, a.judul, a.perihal, a.tanggal, a.jenis, a.status,
+           k.kode AS kode_kategori, k.nama_kategori, a.is_scanned, a.ocr_text
+    FROM arsip a LEFT JOIN kategori k ON k.id=a.kategori_id
+    WHERE a.is_deleted=0 AND (a.ocr_text LIKE ? OR a.judul LIKE ? OR a.perihal LIKE ? OR a.nomor_arsip LIKE ?)
+    ORDER BY a.created_at DESC LIMIT 30`).all(`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`);
+  res.json({ ok: false, rows: rows.map((x) => ({ ...x, snip: '' })), total: rows.length });
+});
+
 // ================= DISPOSISI =================
 router.get('/disposisi', requireAuth, (req, res) => res.json(Q.listDisposisi()));
 router.post('/disposisi', requireAuth, (req, res) => {
@@ -312,18 +371,29 @@ router.put('/pengaturan', requireAuth, requireRole('admin'), (req, res) => {
 });
 
 // ================= USERS =================
-router.get('/users', requireAuth, requireRole('admin'), (req, res) => res.json(Q.listUsers()));
+router.get('/users', requireAuth, requireRole('admin'), (req, res) => {
+  const rows = Q.listUsers();
+  const online = Q.onlineUsers();
+  res.json(rows.map((u) => ({ ...u, online: online.includes(Number(u.id)) })));
+});
+router.get('/users/online', requireAuth, requireRole('admin'), (req, res) => res.json({ jumlah: Q.onlineCount(), ids: Q.onlineUsers() }));
+router.get('/users/aktivitas', requireAuth, requireRole('admin'), (req, res) => res.json(Q.userActivity()));
 router.post('/users', requireAuth, requireRole('admin'), (req, res) => {
   const b = req.body;
   if (!b.username || !b.nama_lengkap) return res.status(400).json({ error: 'Username dan nama lengkap wajib.' });
   if (Q.findUserByUsername(b.username)) return res.status(400).json({ error: 'Username sudah dipakai.' });
-  const u = Q.createUser({ username: b.username, hash: bcrypt.hashSync(b.password || 'password123', 10), nama_lengkap: b.nama_lengkap, nip: b.nip, jabatan: b.jabatan, role: b.role || 'staf', status: b.status === undefined ? 1 : Number(b.status) });
+  const u = Q.createUser({
+    username: b.username,
+    hash: bcrypt.hashSync(b.password || 'password123', 10),
+    nama_lengkap: b.nama_lengkap, nip: b.nip, jabatan: b.jabatan, email: b.email, telepon: b.telepon,
+    role: b.role || 'staf', status: b.status === undefined ? 1 : Number(b.status),
+  });
   logAction(req.user, 'TAMBAH USER', 'pengguna', b.username);
   res.json(u);
 });
 router.put('/users/:id', requireAuth, requireRole('admin'), (req, res) => {
   const b = req.body;
-  Q.updateUser(req.params.id, { nama_lengkap: b.nama_lengkap, nip: b.nip, jabatan: b.jabatan, role: b.role, status: Number(b.status) });
+  Q.updateUser(req.params.id, { nama_lengkap: b.nama_lengkap, nip: b.nip, jabatan: b.jabatan, email: b.email, telepon: b.telepon, role: b.role, status: Number(b.status) });
   if (b.password) Q.setPassword(req.params.id, bcrypt.hashSync(b.password, 10));
   logAction(req.user, 'UBAH USER', 'pengguna', b.username || req.params.id);
   res.json({ ok: true });
@@ -350,6 +420,7 @@ router.get('/dashboard', requireAuth, (req, res) => {
   const bln = new Date().toISOString().slice(0, 7);
   res.json({
     stats: s,
+    storage: Q.storageStats(),
     tren12: Q.tren12Bulan(),
     perStatus: Q.arsipPerStatus(),
     perKategori: Q.arsipPerKategori(),
@@ -357,7 +428,118 @@ router.get('/dashboard', requireAuth, (req, res) => {
     pinjamAktif: Q.listPeminjamanAktif().slice(0, 5),
     disposisiTerbaru: Q.disposisiTerbaru(),
     kegiatanBulan: Q.listKegiatanBulan(bln),
+    recent: Q.recentArsip(6),
   });
+});
+
+// ================= PENGELOLAAN DATABASE (DDL & DATA, khusus admin) =================
+const DBM = require('../db/dbmgmt');
+
+router.get('/db', requireAuth, requireRole('admin'), (req, res) => {
+  const tables = DBM.listTables();
+  const storage = Q.storageStats();
+  res.json({ tables, storage, backups: DBM.listBackups(), fts: Q.ftsAvailable() });
+});
+router.get('/db/table/:name', requireAuth, requireRole('admin'), (req, res) => {
+  const r = DBM.browseTable(req.params.name, {
+    limit: req.query.limit,
+    offset: req.query.offset,
+    where: req.query.where,
+  });
+  if (r.error && !r.info) return res.status(404).json({ error: r.error });
+  res.json(r);
+});
+router.post('/db/query', requireAuth, requireRole('admin'), (req, res) => {
+  const { sql, mode } = req.body || {};
+  if (!sql) return res.status(400).json({ error: 'SQL wajib diisi.' });
+  const m = ['read', 'write', 'ddl'].includes(mode) ? mode : 'read';
+  const r = DBM.runSql(String(sql), m);
+  logAction(req.user, 'SQL ' + (m === 'read' ? 'BACA' : m === 'write' ? 'TULIS' : 'DDL'), 'database', (sql || '').slice(0, 120));
+  if (r.error) return res.status(400).json({ error: r.error });
+  res.json(r);
+});
+router.post('/db/table/:name/row', requireAuth, requireRole('admin'), (req, res) => {
+  const r = DBM.insertRow(req.params.name, req.body.data || {});
+  if (r.error) return res.status(400).json({ error: r.error });
+  logAction(req.user, 'INSERT BARIS', 'database', `${req.params.name} id=${r.id}`);
+  res.json(r);
+});
+router.put('/db/table/:name/row', requireAuth, requireRole('admin'), (req, res) => {
+  const r = DBM.updateRow(req.params.name, req.body.pk || [], req.body.data || {});
+  if (r.error) return res.status(400).json({ error: r.error });
+  logAction(req.user, 'UPDATE BARIS', 'database', `${req.params.name}`);
+  res.json(r);
+});
+router.delete('/db/table/:name/row', requireAuth, requireRole('admin'), (req, res) => {
+  const r = DBM.deleteRow(req.params.name, req.body.pk || []);
+  if (r.error) return res.status(400).json({ error: r.error });
+  logAction(req.user, 'DELETE BARIS', 'database', `${req.params.name}`);
+  res.json(r);
+});
+
+// Backup / integritas / vacum
+router.post('/db/backup', requireAuth, requireRole('admin'), (req, res) => {
+  try {
+    const file = DBM.backupNow('manual');
+    logAction(req.user, 'BACKUP DB', 'database', file);
+    res.json({ ok: true, file });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.get('/db/backups', requireAuth, requireRole('admin'), (req, res) => res.json(DBM.listBackups()));
+router.get('/db/backups/:file', requireAuth, requireRole('admin'), (req, res) => {
+  const base = path.basename(req.params.file);
+  const fp = path.join(BACKUP_DIR, base);
+  if (!fs.existsSync(fp)) return res.status(404).json({ error: 'Cadangan tidak ditemukan.' });
+  res.download(fp, base);
+});
+router.post('/db/integrity', requireAuth, requireRole('admin'), (req, res) => {
+  const r = DBM.integrityCheck();
+  logAction(req.user, 'CEK INTEGRITAS', 'database', r.ok ? 'OK' : 'BERMASALAH');
+  res.json(r);
+});
+router.post('/db/vacuum', requireAuth, requireRole('admin'), (req, res) => {
+  const r = DBM.vacuum();
+  logAction(req.user, 'VACUUM DB', 'database', '');
+  res.json(r);
+});
+// Unduh salinan database utuh (.db) — cadangan penuh aman
+router.get('/db/download', requireAuth, requireRole('admin'), (req, res) => {
+  try {
+    const tmp = DBM.downloadDbCopy();
+    logAction(req.user, 'UNDUH DB (.db)', 'database', '');
+    res.download(tmp, `arsip-bpn-${new Date().toISOString().slice(0, 10)}.db`, (err) => {
+      if (!err) { try { fs.unlinkSync(tmp); } catch (e) { /* */ } }
+    });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+// Restore: terima .json (digabung otomatis), .db / .sql (cadangan penuh, diterapkan manual)
+router.post('/db/restore', requireAuth, requireRole('admin'), uploadAny.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Pilih berkas .json, .db, atau .sql untuk dipulihkan.' });
+  const fname = req.file.filename;
+  const fpath = path.join(UPLOAD_DIR, fname);
+  const ext = path.extname(req.file.originalname || '').toLowerCase();
+  try {
+    if (!RESTORE_EXT.includes(ext)) {
+      fs.unlinkSync(fpath);
+      return res.status(400).json({ error: 'Format tidak didukung. Gunakan .json, .db, atau .sql' });
+    }
+    if (ext === '.json') {
+      const raw = fs.readFileSync(fpath, 'utf8').replace(/^\uFEFF/, '');
+      fs.unlinkSync(fpath);
+      const obj = JSON.parse(raw);
+      const r = DBM.restoreFromJson(obj);
+      logAction(req.user, 'RESTORE JSON', 'database', `${r.inserted.arsip || 0} arsip baru`);
+      res.json(r);
+    } else if (ext === '.db' || ext === '.sql') {
+      const safe = DBM.saveRestoreFile(fpath);
+      fs.unlinkSync(fpath);
+      logAction(req.user, 'UPLOAD DB RESTORE', 'database', path.basename(safe));
+      res.json({ ok: true, note: 'Berkas diterima dan disimpan di data/restore/. Untuk menerapkan: matikan aplikasi, ganti data/arsip-bpn.db dengan berkas ini (atau jalankan via Konsol SQL), lalu nyalakan lagi.', di: path.basename(safe) });
+    }
+  } catch (e) {
+    try { fs.unlinkSync(fpath); } catch (e2) { /* */ }
+    res.status(500).json({ error: 'Restore gagal: ' + e.message });
+  }
 });
 
 // ================= LAPORAN / EKSPOR =================
@@ -509,7 +691,7 @@ router.post('/laporan/import-csv', requireAuth, requireRole('admin'), upload.sin
 // -------- Backup JSON --------
 router.get('/laporan/backup', requireAuth, requireRole('admin'), (req, res) => {
   const backup = {
-    meta: { nama: 'Sistem Arsip', versi: 2, dibuat: new Date().toISOString(), oleh: req.user.username },
+    meta: { nama: 'Sistem Arsip', versi: 3, dibuat: new Date().toISOString(), oleh: req.user.username },
     pengaturan: Q.getPengaturan(),
     users: Q.listUsers(),
     kategori: Q.listKategori(),
@@ -523,7 +705,7 @@ router.get('/laporan/backup', requireAuth, requireRole('admin'), (req, res) => {
     log: db.prepare('SELECT * FROM log ORDER BY id').all(),
   };
   // batasi arsip agar tidak terlalu besar (hapus file_path binary) -> simpan nama file saja
-  backup.arsip = db.prepare('SELECT id, nomor_arsip, kategori_id, jenis, judul, perihal, tanggal, tahun_arsip, instansi_id, unit_id, lokasi_id, status, file_name, keterangan, is_deleted, deleted_at, created_by, created_at, updated_at FROM arsip').all();
+  backup.arsip = db.prepare('SELECT id, nomor_arsip, kategori_id, jenis, judul, perihal, tanggal, tahun_arsip, instansi_id, unit_id, lokasi_id, status, file_name, keterangan, tags, ocr_text, ocr_bahasa, ocr_updated_at, is_scanned, is_deleted, deleted_at, created_by, created_at, updated_at FROM arsip').all();
   logAction(req.user, 'BACKUP JSON', 'sistem', '');
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.setHeader('Content-Disposition', `attachment; filename="backup-arsip-bpn-${new Date().toISOString().slice(0, 10)}.json"`);

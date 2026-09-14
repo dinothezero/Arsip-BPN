@@ -5,9 +5,9 @@ const { db } = require('./db');
 // ---------- Auth / users ----------
 const qUserByUsername = db.prepare('SELECT * FROM users WHERE username = ?');
 const qUserById = db.prepare('SELECT * FROM users WHERE id = ?');
-const qListUsers = db.prepare('SELECT id, username, nama_lengkap, nip, jabatan, role, status, last_login, created_at FROM users ORDER BY role, username');
-const qInsertUser = db.prepare('INSERT INTO users (username, password_hash, nama_lengkap, nip, jabatan, role, status) VALUES (?,?,?,?,?,?,?)');
-const qUpdateUser = db.prepare('UPDATE users SET nama_lengkap=?, nip=?, jabatan=?, role=?, status=? WHERE id=?');
+const qListUsers = db.prepare('SELECT id, username, nama_lengkap, nip, jabatan, email, telepon, role, status, last_login, created_at FROM users ORDER BY role, username');
+const qInsertUser = db.prepare('INSERT INTO users (username, password_hash, nama_lengkap, nip, jabatan, email, telepon, role, status) VALUES (?,?,?,?,?,?,?,?,?)');
+const qUpdateUser = db.prepare('UPDATE users SET nama_lengkap=?, nip=?, jabatan=?, email=?, telepon=?, role=?, status=? WHERE id=?');
 const qUpdatePassword = db.prepare('UPDATE users SET password_hash=? WHERE id=?');
 const qSetLastLogin = db.prepare('UPDATE users SET last_login = datetime(\'now\',\'localtime\') WHERE id=?');
 const qDeleteUser = db.prepare('DELETE FROM users WHERE id=?');
@@ -16,13 +16,46 @@ function findUserByUsername(u) { return qUserByUsername.get(u); }
 function findUserById(id) { return qUserById.get(id); }
 function listUsers() { return qListUsers.all(); }
 function createUser(u) {
-  qInsertUser.run(u.username, u.hash, u.nama_lengkap, u.nip || '', u.jabatan || '', u.role, u.status === undefined ? 1 : u.status);
+  qInsertUser.run(u.username, u.hash, u.nama_lengkap, u.nip || '', u.jabatan || '', u.email || '', u.telepon || '', u.role, u.status === undefined ? 1 : u.status);
   return db.prepare('SELECT * FROM users WHERE username=?').get(u.username);
 }
-function updateUser(id, u) { qUpdateUser.run(u.nama_lengkap, u.nip || '', u.jabatan || '', u.role, u.status, id); }
+function updateUser(id, u) {
+  // Pertahankan nilai lama untuk kolom tambahan bila tidak dikirim
+  const old = findUserById(id);
+  qUpdateUser.run(u.nama_lengkap || old.nama_lengkap, u.nip !== undefined ? u.nip : (old.nip || ''), u.jabatan !== undefined ? u.jabatan : (old.jabatan || ''),
+    u.email !== undefined ? u.email : (old.email || ''), u.telepon !== undefined ? u.telepon : (old.telepon || ''),
+    u.role || old.role, u.status === undefined ? old.status : Number(u.status), id);
+}
+function updateProfil(id, p) {
+  // Ubah profil akun sendiri (tanpa peran/status)
+  const old = findUserById(id);
+  db.prepare('UPDATE users SET nama_lengkap=?, nip=?, jabatan=?, email=?, telepon=? WHERE id=?')
+    .run(p.nama_lengkap || old.nama_lengkap, p.nip !== undefined ? p.nip : (old.nip || ''), p.jabatan !== undefined ? p.jabatan : (old.jabatan || ''),
+      p.email !== undefined ? p.email : (old.email || ''), p.telepon !== undefined ? p.telepon : (old.telepon || ''), id);
+}
 function setPassword(id, hash) { qUpdatePassword.run(hash, id); }
 function setLastLogin(id) { qSetLastLogin.run(id); }
 function deleteUser(id) { qDeleteUser.run(id); }
+
+// Kehadiran online (in-memory: id pengguna -> waktu permintaan terakhir)
+const online = new Map();
+function markOnline(id) { if (id) online.set(Number(id), Date.now()); }
+function onlineUsers() {
+  const now = Date.now();
+  const out = [];
+  for (const [id, t] of online) { if (now - t < 5 * 60 * 1000) out.push(id); }
+  return out;
+}
+function onlineCount() { return onlineUsers().length; }
+
+// Aktifitas per pengguna (untuk manajemen multi-akun)
+function userActivity(limit) {
+  return db.prepare(`
+    SELECT l.user_id, u.nama_lengkap, u.username, COUNT(*) AS jumlah, MAX(l.created_at) AS terakhir
+    FROM log l LEFT JOIN users u ON u.id = l.user_id
+    WHERE l.user_id IS NOT NULL
+    GROUP BY l.user_id ORDER BY terakhir DESC LIMIT ?`).all(limit || 20);
+}
 
 // delete user's references cleanup
 function removeUserDisposisiKe(id) { db.prepare('UPDATE disposisi SET ke_user_id = (SELECT id FROM users WHERE role=? LIMIT 1) WHERE ke_user_id=?').run('admin', id); }
@@ -85,13 +118,13 @@ function updateInstansi(id, x) { qUpdateInstansi.run(x.nama_instansi, x.jenis, x
 function deleteInstansi(id) { qDeleteInstansi.run(id); }
 
 // ---------- Arsip ----------
-function listArsip({ q, kategori_id, jenis, status, instansi_id, lokasi_id, unit_id, dari, sampai, tahun, sort, order, limit, offset }) {
+function listArsip({ q, kategori_id, jenis, status, instansi_id, lokasi_id, unit_id, dari, sampai, tahun, ocr, sort, order, limit, offset }) {
   const w = ['a.is_deleted = 0'];
   const p = [];
   if (q) {
-    w.push('(a.nomor_arsip LIKE ? OR a.judul LIKE ? OR a.perihal LIKE ? OR a.keterangan LIKE ?)');
+    w.push('(a.nomor_arsip LIKE ? OR a.judul LIKE ? OR a.perihal LIKE ? OR a.keterangan LIKE ? OR a.tags LIKE ? OR a.ocr_text LIKE ?)');
     const like = `%${q}%`;
-    p.push(like, like, like, like);
+    p.push(like, like, like, like, like, like);
   }
   if (kategori_id) { w.push('a.kategori_id = ?'); p.push(kategori_id); }
   if (jenis) { w.push('a.jenis = ?'); p.push(jenis); }
@@ -101,6 +134,8 @@ function listArsip({ q, kategori_id, jenis, status, instansi_id, lokasi_id, unit
   if (unit_id) { w.push('a.unit_id = ?'); p.push(unit_id); }
   if (dari && sampai) { w.push('a.tanggal BETWEEN ? AND ?'); p.push(dari, sampai); }
   if (tahun) { w.push('a.tahun_arsip = ?'); p.push(tahun); }
+  if (ocr === 'sudah') { w.push('a.ocr_text != \'\''); }
+  if (ocr === 'belum') { w.push('a.ocr_text = \'\''); }
 
   const orderBy = (sort || 'created_at') + ' ' + (order === 'asc' ? 'ASC' : 'DESC');
   const lim = limit ? parseInt(limit, 10) : 50;
@@ -110,7 +145,9 @@ function listArsip({ q, kategori_id, jenis, status, instansi_id, lokasi_id, unit
   const total = db.prepare(`SELECT COUNT(*) AS n FROM arsip a WHERE ${where}`).get(...p).n;
   const rows = db.prepare(`
     SELECT a.*, k.kode AS kode_kategori, k.nama_kategori,
-           l.nama_lokasi, u.nama_unit, i.nama_instansi, cr.nama_lengkap AS creator
+           l.nama_lokasi, u.nama_unit, i.nama_instansi, cr.nama_lengkap AS creator,
+           CASE WHEN a.ocr_text != '' THEN 1 ELSE 0 END AS has_ocr,
+           substr(a.ocr_text, 1, 160) AS ocr_preview
     FROM arsip a
     LEFT JOIN kategori k ON k.id = a.kategori_id
     LEFT JOIN lokasi l ON l.id = a.lokasi_id
@@ -356,9 +393,106 @@ function disposisiTerbaru() {
     ORDER BY d.created_at DESC LIMIT 5`).all();
 }
 
+// ---------- OCR ----------
+function setArsipOcr(arsipId, { text, bahasa, durasi_ms, halaman, mode, byUserId }) {
+  const t = (text || '').trim();
+  const upd = db.prepare(`
+    UPDATE arsip SET ocr_text=?, ocr_bahasa=?, is_scanned=CASE WHEN ? != '' THEN 1 ELSE is_scanned END,
+      ocr_updated_at=datetime('now','localtime'), updated_at=datetime('now','localtime') WHERE id=?`);
+  upd.run(t, (bahasa || 'ind').slice(0, 10), t, arsipId);
+  db.prepare('INSERT INTO arsip_scan (arsip_id, bahasa, halaman, durasi_ms, teks, mode, created_by) VALUES (?,?,?,?,?,?,?)')
+    .run(arsipId, (bahasa || 'ind').slice(0, 10), halaman || 1, durasi_ms || 0, t, mode || 'upload', byUserId || null);
+  return t.length;
+}
+function getArsipOcr(arsipId) {
+  const a = db.prepare('SELECT ocr_text FROM arsip WHERE id=?').get(arsipId);
+  return a ? (a.ocr_text || '') : '';
+}
+function listScanHistory(arsipId) {
+  return db.prepare('SELECT * FROM arsip_scan WHERE arsip_id=? ORDER BY created_at DESC').all(arsipId);
+}
+function countOcr() {
+  return db.prepare("SELECT COUNT(*) AS n FROM arsip WHERE is_deleted=0 AND ocr_text != ''").get().n;
+}
+
+// ---------- Pencarian teks penuh (FTS5) ----------
+function ftsAvailable() {
+  return !!db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='arsip_fts'`).get();
+}
+function ftsQuery(q) {
+  // Lindungi sintaks FTS5: pisah token, jadikan frase-literal AND
+  return q.trim().split(/\s+/).map((t) => `"${t.replace(/"/g, '""')}"`).join(' AND ');
+}
+function searchFullText(q, limit) {
+  const lim = limit ? parseInt(limit, 10) : 30;
+  if (!q || !ftsAvailable()) return { ok: false, rows: [] };
+  try {
+    const mq = ftsQuery(q);
+    const rows = db.prepare(`
+      SELECT a.id, a.nomor_arsip, a.judul, a.perihal, a.tanggal, a.jenis, a.status,
+             k.kode AS kode_kategori, k.nama_kategori, a.is_scanned,
+             snippet(arsip_fts, -1, '<mark>', '</mark>', ' … ', 24) AS snip,
+             bm25(arsip_fts) AS skor
+      FROM arsip_fts
+      LEFT JOIN arsip a ON a.id = arsip_fts.rowid
+      LEFT JOIN kategori k ON k.id = a.kategori_id
+      WHERE arsip_fts MATCH ?
+      ORDER BY skor LIMIT ?`).all(mq, lim);
+    return { ok: true, rows, total: rows.length };
+  } catch (e) {
+    return { ok: false, rows: [], error: e.message };
+  }
+}
+
+// Pranala silang: arsip yang sering bersamaan / terkait (by kategori+instansi)
+function relatedArsip(arsipId, limit) {
+  const a = db.prepare('SELECT kategori_id, instansi_id, unit_id FROM arsip WHERE id=?').get(arsipId);
+  if (!a) return [];
+  const base = ['a.id != ?', 'a.is_deleted=0'];
+  const p = [arsipId];
+  const terkait = [];
+  if (a.kategori_id) { terkait.push('a.kategori_id = ?'); p.push(a.kategori_id); }
+  if (a.instansi_id) { terkait.push('a.instansi_id = ?'); p.push(a.instansi_id); }
+  if (a.unit_id) { terkait.push('a.unit_id = ?'); p.push(a.unit_id); }
+  if (!terkait.length) return [];
+  const sql = `SELECT a.nomor_arsip, a.judul, a.tanggal FROM arsip a
+    WHERE ${base.join(' AND ')} AND (${terkait.join(' OR ')}) ORDER BY a.created_at DESC LIMIT ?`;
+  return db.prepare(sql).all(...p, limit || 8);
+}
+
+// ---------- Storage & sistem ----------
+function storageStats() {
+  const totalFiles = db.prepare("SELECT COUNT(*) AS n, COALESCE(SUM(file_size),0) AS bytes FROM arsip WHERE file_size > 0 AND is_deleted=0").get();
+  const q = db.prepare(`
+    SELECT
+      (SELECT COUNT(*) FROM arsip WHERE is_deleted=0) AS total_arsip,
+      (SELECT COUNT(*) FROM arsip WHERE is_deleted=0 AND ocr_text != '') AS sudah_ocr,
+      (SELECT COUNT(*) FROM arsip WHERE is_deleted=0 AND ocr_text = '') AS belum_ocr,
+      (SELECT COUNT(*) FROM users WHERE status=1) AS total_user,
+      (SELECT COUNT(*) FROM kategori) AS total_kategori,
+      (SELECT COUNT(*) FROM lokasi) AS total_lokasi,
+      (SELECT COUNT(*) FROM unit) AS total_unit,
+      (SELECT COUNT(*) FROM instansi) AS total_instansi,
+      (SELECT COUNT(*) FROM agenda) AS total_agenda,
+      (SELECT COUNT(*) FROM arsip_scan) AS total_pindai,
+      (SELECT COUNT(*) FROM log) AS total_log`);
+  const row = q.get();
+  row.file_konten = totalFiles.n;
+  row.file_bytes = totalFiles.bytes;
+  row.db_bytes = db.prepare('PRAGMA page_count').get().c * db.prepare('PRAGMA page_size').get().c;
+  return row;
+}
+
+function recentArsip(limit) {
+  return db.prepare(`SELECT a.id, a.nomor_arsip, a.judul, a.tanggal, a.jenis, a.status,
+      k.kode AS kode_kategori, a.created_at FROM arsip a
+    LEFT JOIN kategori k ON k.id=a.kategori_id
+    WHERE a.is_deleted=0 ORDER BY a.created_at DESC LIMIT ?`).all(limit || 6);
+}
+
 module.exports = {
-  findUserByUsername, findUserById, listUsers, createUser, updateUser, setPassword, setLastLogin,
-  deleteUser, removeUserDisposisiKe,
+  findUserByUsername, findUserById, listUsers, createUser, updateUser, updateProfil, setPassword, setLastLogin,
+  deleteUser, removeUserDisposisiKe, markOnline, onlineUsers, onlineCount, userActivity,
   getPengaturan, updatePengaturan,
   listKategori, getKategori, createKategori, updateKategori, deleteKategori,
   listLokasi, createLokasi, updateLokasi, deleteLokasi,
@@ -375,4 +509,7 @@ module.exports = {
   createNotifikasi, listNotifikasiUser, countBelumBaca, markAllBaca, markOneBaca,
   writeLog, listLog, countLog,
   dashStats, tren12Bulan, arsipPerStatus, arsipPerKategori, arsipPerBulan, disposisiTerbaru,
+  setArsipOcr, getArsipOcr, listScanHistory, countOcr,
+  ftsAvailable, ftsQuery, searchFullText, relatedArsip,
+  storageStats, recentArsip,
 };

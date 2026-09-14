@@ -535,3 +535,55 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001s !important; transition-duration: .001s !important; }
 }
+
+/* ============================================================
+   v3: OCR / Cari Isi Dokumen / Kelola Database
+   ============================================================ */
+
+/* highlight hasil FTS */
+.ocrmark { background: rgba(212, 175, 55, .28); color: #7a5c00; border-radius: 3px; padding: 0 2px; }
+
+/* badge varian */
+.badge-green { background: #dcfce7; color: #166534; }
+.badge-red { background: #fee2e2; color: #b91c1c; }
+.badge-teal { background: #ccfbf1; color: #115e59; }
+
+/* kode SQL */
+.sql-pre { background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 12px 14px; overflow-x: auto; font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace; font-size: 12.5px; line-height: 1.6; overflow-wrap: anywhere; }
+.sql-mini { background: #f1f5f9; color: #334155; border-radius: 4px; padding: 1px 6px; font-size: 11.5px; font-family: 'JetBrains Mono', Consolas, monospace; }
+
+/* mini-stat cards (status database) */
+.mini-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.mini { background: var(--slate-50, #f8fafc); border: 1px solid var(--slate-200, #e2e8f0); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
+.mi-icon { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; font-size: 15px; flex: none; }
+.ic-teal { background: #ccfbf1; color: #0f766e; }
+.ic-blue { background: #dbeafe; color: #1d4ed8; }
+.ic-green { background: #dcfce7; color: #15803d; }
+.ic-gold { background: #fef3c7; color: #b45309; }
+.mi-v { font-weight: 800; font-size: 17px; color: var(--slate-900, #0f172a); line-height: 1.1; }
+.mi-l { font-size: 11.5px; color: var(--slate-500, #64748b); }
+
+/* preview hasil OCR */
+.img-prev { max-width: 320px; margin: 0 auto; }
+.img-prev img { width: 100%; border: 1px solid var(--slate-200, #e2e8f0); border-radius: 10px; box-shadow: 0 4px 14px rgba(15, 23, 42, .08); }
+.img-ok { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #dcfce7; color: #166534; border-radius: 8px; font-size: 13px; }
+
+/* kotak modal OCR */
+.ocr-box { display: flex; flex-direction: column; gap: 14px; }
+.ocr-ops { background: var(--slate-50, #f8fafc); border: 1px solid var(--slate-200, #e2e8f0); border-radius: 10px; padding: 14px; }
+.ocr-preview { background: var(--slate-50, #f8fafc); border: 1px dashed var(--slate-300, #cbd5e1); border-radius: 10px; min-height: 120px; }
+
+/* progress bar OCR */
+.ocr-progress { margin: 4px 0; }
+.ocr-progress .pr-bar { height: 8px; background: var(--slate-200, #e2e8f0); border-radius: 99px; overflow: hidden; }
+.ocr-progress .pr-fill { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #0b6e4f, #0fba81); transition: width .2s; border-radius: 99px; }
+.ocr-progress .pr-txt { margin-top: 6px; font-size: 12px; color: var(--slate-500, #64748b); }
+
+/* sidebar OCR toggle untuk panel detail */
+.ocr-mini { margin-top: 6px; }
+
+/* dropzone restore */
+.drop-zone { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 26px 14px; border: 2px dashed var(--slate-300, #cbd5e1); border-radius: 12px; cursor: pointer; color: var(--slate-500, #64748b); font-size: 13px; transition: .2s; text-align: center; }
+.drop-zone:hover { border-color: #0b6e4f; background: #f0fdf9; color: #0b6e4f; }
+.drop-zone input { display: none; }
+.drop-zone i { font-size: 26px; }
