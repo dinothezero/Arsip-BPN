@@ -54,6 +54,7 @@
   --hijau-100: #e3f6ee;
   --hijau-50:  #f1faf6;
   --toska-400: #2dd4bf;
+  --merah: #c3222e;
   --emas-500: #c9a227;
   --emas-300: #e6c65c;
   --ink: #0f172a;
@@ -127,13 +128,15 @@ h2 { font-weight: 700; }
 /* ============ LATAR & STRUKTUR ============ */
 #app {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
 }
+.app-shell { display: flex; flex: 1; min-height: 0; }
 #login-screen {
   min-height: 100vh;
-  display: flex; align-items: center; justify-content: center;
+  display: flex; flex-direction: column;
   background:
-    linear-gradient(150deg, var(--hijau-900), var(--hijau-700) 55%, var(--hijau-600));
+    linear-gradient(160deg, var(--hijau-900), var(--hijau-700) 55%, var(--hijau-600));
   position: relative;
   overflow: hidden;
 }
@@ -143,6 +146,7 @@ h2 { font-weight: 700; }
 }
 #login-screen::before { width: 520px; height: 520px; top: 10%; left: 5%; }
 #login-screen::after { width: 360px; height: 360px; bottom: 5%; right: 8%; }
+.login-stage { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; }
 
 .login-wrap { width: 100%; max-width: 980px; padding: 24px; position: relative; z-index: 2; display: flex; gap: 44px; align-items: center; }
 .login-brand { flex: 1.1; color: #fff; }
@@ -198,8 +202,61 @@ textarea.field { min-height: 84px; resize: vertical; }
 .icon-btn:hover { background: var(--slate-100); color: var(--ink); }
 .icon-btn.danger:hover { background: #fee2e2; color: var(--danger); }
 
-/* logo burung garuda sederhana berbentuk data URI (ikon fas circle) */
-.garuda svg { width: 40px; height: 40px; }
+/* lambang (perisai sederhana) */
+.emblem { line-height: 0; flex: none; }
+.emblem svg { width: 52px; height: 58px; }
+.emblem.big svg { width: 74px; height: 84px; }
+
+/* ============ KOP RESMI PEMERINTAH ============ */
+#govtop, .govtop { background: linear-gradient(120deg, #052f26, #0b6e4f 62%, #0e9f6e); color: #fff; }
+.govtop-in { max-width: 1500px; margin: 0 auto; display: flex; align-items: center; gap: 16px; padding: 12px 24px; }
+#govtop .emblem, .govtop .emblem { filter: drop-shadow(0 3px 8px rgba(0,0,0,.35)); }
+.govtitles { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.govtitles .gt1 { font-size: 10.5px; letter-spacing: 1.6px; color: var(--emas-300); font-weight: 700; text-transform: uppercase; }
+.govtitles .gt2 { font-family: var(--font-serif); font-size: 17px; font-weight: 700; letter-spacing: .3px; }
+.govtitles .gt3 { font-size: 12px; color: rgba(255,255,255,.78); letter-spacing: .5px; }
+.govmeta { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; text-align: right; }
+.govmeta .gm-badge { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; color: #fff; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.3); padding: 5px 12px; border-radius: 999px; letter-spacing: .6px; }
+.govmeta .gm-badge i { color: var(--emas-300); }
+.govmeta .gm-date { font-size: 12px; color: rgba(255,255,255,.75); }
+
+/* pita warna merah-putih khas situs resmi */
+.tricolor { display: flex; height: 5px; width: 100%; }
+.tricolor i:nth-child(1) { flex: 1; background: #c3222e; }
+.tricolor i:nth-child(2) { flex: 1; background: #ffffff; }
+.tricolor i:nth-child(3) { flex: 1; background: var(--emas-500); }
+
+/* govtop pada halaman login (menyatu dgn kartu) */
+.govtop-inline { position: relative; z-index: 2; }
+
+/* ============ KAKI HALAMAN ============ */
+#footer { background: #052f26; color: rgba(255,255,255,.82); }
+.foot-grid { max-width: 1500px; margin: 0 auto; display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 28px; padding: 26px 24px 20px; }
+.foot-grid > div { display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; }
+.foot-grid b { color: #fff; }
+.foot-about { flex-direction: row !important; align-items: flex-start; gap: 14px !important; }
+.foot-about .emblem { width: 44px; height: 50px; }
+.foot-about .emblem svg { width: 44px; height: 50px; }
+.foot-about b { font-family: var(--font-serif); font-size: 15px; }
+.foot-about p { color: rgba(255,255,255,.7); margin-top: 5px; font-size: 12px; line-height: 1.55; }
+.foot-h { font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--emas-300) !important; margin-bottom: 2px; }
+.foot-list { display: flex; flex-direction: column; gap: 7px; }
+.foot-list span { color: rgba(255,255,255,.7); }
+.foot-list a { color: rgba(255,255,255,.78); text-decoration: none; display: inline-flex; align-items: center; gap: 7px; }
+.foot-list a:hover { color: var(--emas-300); }
+.foot-list a i, .foot-list span i { width: 15px; text-align: center; color: var(--emas-300); font-size: 11px; }
+.foot-bar { border-top: 1px solid rgba(255,255,255,.12); }
+.foot-bar > span { max-width: 1500px; margin: 0 auto; display: flex; align-items: center; gap: 10px; padding: 12px 24px; font-size: 11.5px; color: rgba(255,255,255,.6); }
+.foot-bar .fb-right { margin-left: auto; }
+
+/* kaki halaman login */
+.login-foot { position: relative; z-index: 2; display: flex; align-items: center; gap: 14px; padding: 16px 26px; border-top: 1px solid rgba(255,255,255,.14); }
+.login-foot .emblem { width: 34px; height: 38px; opacity: .9; }
+.login-foot .emblem svg { width: 34px; height: 38px; }
+.login-foot .lf-mid { display: flex; flex-direction: column; color: rgba(255,255,255,.85); font-size: 11.5px; }
+.login-foot .lf-mid b { font-size: 12.5px; }
+.login-foot .lf-right { margin-left: auto; color: rgba(255,255,255,.75); font-size: 11.5px; display: flex; align-items: center; gap: 6px; }
+.login-foot .lf-right i { color: var(--emas-300); }
 
 /* sidebar */
 #sidebar {
@@ -209,8 +266,15 @@ textarea.field { min-height: 84px; resize: vertical; }
 }
 .side-brand { display: flex; align-items: center; gap: 12px; padding: 20px 22px; border-bottom: 1px solid rgba(255,255,255,.08); }
 .side-brand .logo-mini {
-  width: 46px; height: 46px; border-radius: 12px; background: #fff; color: var(--hijau-700);
-  display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px;
+  width: 46px; height: 46px; border-radius: 12px; background: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+.side-brand .logo-mini svg { width: 30px; height: 35px; }
+.login-brand .logo-symbol svg { width: 56px; height: 64px; }
+.login-brand .logo-symbol {
+  width: 86px; height: 86px; border-radius: 18px; background: #fff;
+  display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+  box-shadow: 0 12px 30px -8px rgba(0,0,0,.4); padding: 8px;
 }
 .side-brand .nm { font-weight: 700; font-size: 14px; line-height: 1.25; }
 .side-brand .nm small { display: block; font-weight: 400; color: rgba(255,255,255,.6); font-size: 11.5px; }
@@ -285,14 +349,14 @@ textarea.field { min-height: 84px; resize: vertical; }
 /* gov stripe */
 .gov-stripe { display: flex; height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 18px; }
 .gov-stripe span { flex: 1; }
-.gov-stripe .gs1 { background: var(--hijau-800); }
-.gov-stripe .gs2 { background: var(--hijau-600); }
-.gov-stripe .gs3 { background: var(--toska-400); }
+.gov-stripe .gs1 { background: var(--merah); }
+.gov-stripe .gs2 { background: #ffffff; box-shadow: inset 0 0 0 1px var(--slate-200); }
+.gov-stripe .gs3 { background: var(--hijau-800); }
 .gov-stripe .gs4 { background: var(--emas-500); }
 
 /* heading halaman */
 .page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
-.page-head h1 { font-size: 22px; font-weight: 800; }
+.page-head h1 { font-size: 22px; font-weight: 800; font-family: var(--font-serif); }
 .page-head .sub { color: var(--slate-500); font-size: 13px; margin-top: 2px; }
 .page-toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
 
@@ -401,7 +465,8 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   position: fixed; inset: 0; z-index: 999; background: var(--hijau-900);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; color: #fff;
 }
-#splash .s-logo { width: 84px; height: 84px; border-radius: 24px; background: #fff; color: var(--hijau-700); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 40px; animation: breathe 2s ease-in-out infinite; }
+#splash .s-logo { width: 84px; height: 84px; border-radius: 24px; background: #fff; display: flex; align-items: center; justify-content: center; animation: breathe 2s ease-in-out infinite; box-shadow: 0 12px 30px -8px rgba(0,0,0,.4); }
+#splash .s-logo svg { width: 54px; height: 62px; }
 #splash .s-text { font-family: var(--font-serif); font-size: 20px; }
 #splash .s-sub { color: rgba(255,255,255,.65); font-size: 13px; }
 #splash .s-bar { width: 180px; height: 4px; background: rgba(255,255,255,.15); border-radius: 4px; overflow: hidden; }
@@ -517,6 +582,17 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   .grid-3 { grid-template-columns: 1fr; }
   .grid-2 { grid-template-columns: 1fr; }
   .kvp { grid-template-columns: 130px 1fr; }
+  .foot-grid { grid-template-columns: 1fr 1fr; }
+  .govtop-in { flex-wrap: wrap; row-gap: 8px; }
+  .govmeta { margin-left: 0; align-items: flex-start; }
+}
+@media (max-width: 560px) {
+  .foot-grid { grid-template-columns: 1fr; }
+  .foot-bar > span { flex-wrap: wrap; }
+  .login-foot { flex-wrap: wrap; }
+  .login-foot .lf-right { margin-left: 0; }
+  .govtitles .gt2 { font-size: 13.5px; }
+  .govtitles .gt3 { font-size: 10.5px; }
 }
 @media (max-width: 560px) {
   #topbar { padding: 10px 12px; }

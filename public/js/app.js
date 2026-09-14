@@ -31,6 +31,17 @@ const Modal = {
 const App = {
   user: null,
   state: { notifBelum: 0 },
+  /* Lambang sederhana: perisai berwarna hijau BPN dengan bintang & pita merah-putih */
+  EMBLEM: `<svg viewBox="0 0 100 118" role="img" aria-label="Lambang">
+    <path d="M50 6 L90 21 V58 C90 83 73 99 50 111 C27 99 10 83 10 58 V21 Z" fill="#0b6e4f"/>
+    <path d="M50 6 L90 21 V58 C90 83 73 99 50 111 C27 99 10 83 10 58 V21 Z" fill="none" stroke="#e6c65c" stroke-width="4"/>
+    <polygon points="50,18 52.7,25 60.5,26 54.7,31 56.2,38.5 50,35 43.8,38.5 45.3,31 39.5,26 47.3,25" fill="#e6c65c"/>
+    <rect x="21" y="48" width="58" height="10" fill="#ffffff" stroke="#0b6e4f" stroke-width="1.6"/>
+    <rect x="21" y="60" width="58" height="10" fill="#c3222e"/>
+    <rect x="21" y="72" width="58" height="10" fill="#ffffff" stroke="#0b6e4f" stroke-width="1.6"/>
+    <rect x="40" y="62" width="20" height="6" fill="#0b6e4f"/>
+  </svg>`,
+  INDONESIA_DATE: () => new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
   routes: {
     '/dashboard': { title: 'Dashboard', view: 'dashboard', ico: 'fa-gauge-high', crumb: 'Beranda' },
     '/arsip': { title: 'Arsip Dokumen', view: 'arsip', ico: 'fa-folder-open', crumb: 'Pengelolaan Arsip' },
@@ -78,27 +89,46 @@ const App = {
   },
   loginHTML() {
     return `
-      <div class="login-wrap">
-        <div class="login-brand">
-          <div class="logo-symbol"><i class="fas fa-landmark-dome" style="font-size:36px;color:#0b6e4f"></i></div>
-          <h1>Sistem Arsip<br>Kantor Pertanahan</h1>
-          <p>Pengelolaan arsip surat, sertifikat, dan dokumen pertanahan secara digital. Berjalan <b>100% lokal</b> di komputer Anda, tanpa biaya dan tanpa internet.</p>
-          <div class="feat-pills">
-            <span>Multi-Akun</span><span>Scan / OCR Dokumen</span><span>Cari Isi Dokumen</span><span>Disposisi</span><span>Peminjaman</span><span>QR Code</span><span>Kelola Database (DDL)</span><span>Backup &amp; Restore</span>
+      <header class="govtop govtop-inline">
+        <div class="govtop-in">
+          <div class="emblem">${this.EMBLEM}</div>
+          <div class="govtitles">
+            <span class="gt1">KEMENTERIAN AGRARIA DAN TATA RUANG</span>
+            <span class="gt2">BADAN PERTANAHAN NASIONAL</span>
+            <span class="gt3">KANTOR PERTANAHAN KABUPATEN/KOTA</span>
+          </div>
+          <div class="govmeta"><span class="gm-badge"><i class="fas fa-certificate"></i><b>WEBSITE RESMI PEMERINTAH</b></span></div>
+        </div>
+        <div class="tricolor"><i></i><i></i><i></i></div>
+      </header>
+      <div class="login-stage">
+        <div class="login-wrap">
+          <div class="login-brand">
+            <div class="logo-symbol">${this.EMBLEM}</div>
+            <h1>Sistem Arsip<br>Kantor Pertanahan</h1>
+            <p>Pengelolaan arsip surat, sertifikat, dan dokumen pertanahan secara digital. Berjalan <b>100% lokal</b> di komputer Anda, tanpa biaya dan tanpa internet.</p>
+            <div class="feat-pills">
+              <span>Multi-Akun</span><span>Scan / OCR Dokumen</span><span>Cari Isi Dokumen</span><span>Disposisi</span><span>Peminjaman</span><span>QR Code</span><span>Kelola Database (DDL)</span><span>Backup &amp; Restore</span>
+            </div>
+          </div>
+          <div class="login-card">
+            <h3>Masuk ke Sistem</h3>
+            <p class="sub">Gunakan akun yang diberikan oleh administrator.</p>
+            <form onsubmit="App.login(event)">
+              <div class="row"><label>Username</label><input class="field" id="login-username" autocomplete="username" placeholder="contoh: admin" required></div>
+              <div class="row"><label>Password</label><input class="field" id="login-password" type="password" autocomplete="current-password" placeholder="••••••••" required></div>
+              <div class="row" id="login-err" style="display:none;color:#b91c1c;font-size:13px;background:#fdecec;padding:10px 14px;border-radius:8px"></div>
+              <div class="row mt-3"><button class="btn btn-primary btn-block" id="login-btn" type="submit"><i class="fas fa-right-to-bracket"></i> Masuk</button></div>
+            </form>
+            <p class="text-center text-small text-muted mt-3">Kantor Pertanahan &middot; Sistem Arsip Digital &middot; v3.0</p>
           </div>
         </div>
-        <div class="login-card">
-          <h3>Masuk ke Sistem</h3>
-          <p class="sub">Gunakan akun yang diberikan oleh administrator.</p>
-          <form onsubmit="App.login(event)">
-            <div class="row"><label>Username</label><input class="field" id="login-username" autocomplete="username" placeholder="contoh: admin" required></div>
-            <div class="row"><label>Password</label><input class="field" id="login-password" type="password" autocomplete="current-password" placeholder="••••••••" required></div>
-            <div class="row" id="login-err" style="display:none;color:#b91c1c;font-size:13px;background:#fdecec;padding:10px 14px;border-radius:8px"></div>
-            <div class="row mt-3"><button class="btn btn-primary btn-block" id="login-btn" type="submit"><i class="fas fa-right-to-bracket"></i> Masuk</button></div>
-          </form>
-          <p class="text-center text-small text-muted mt-3">Kantor Pertanahan &middot; Sistem Arsip Digital &middot; v3.0</p>
-        </div>
-      </div>`;
+      </div>
+      <footer class="login-foot">
+        <div class="lf-left">${this.EMBLEM}</div>
+        <div class="lf-mid"><b>Website Resmi Sistem Arsip Digital Kantor Pertanahan</b><span>Hak cipta &copy; ${new Date().getFullYear()} Badan Pertanahan Nasional · Berjalan 100% lokal, tanpa biaya</span></div>
+        <div class="lf-right"><i class="fas fa-clock"></i> Jam Layanan: Senin–Jumat 08.00–15.30 WIB</div>
+      </footer>`;
   },
   async login(e) {
     e.preventDefault();
@@ -135,6 +165,8 @@ const App = {
       document.getElementById('login-screen').classList.add('hidden');
       const app = document.getElementById('app');
       app.classList.remove('hidden');
+      this.renderGovTop();
+      this.renderFooter();
       this.renderSidebar();
       this.renderTopbar();
       this.bindGlobal();
@@ -187,13 +219,74 @@ const App = {
     return items;
   },
   roleOf() { return this.user ? this.user.role : ''; },
+  renderGovTop() {
+    document.getElementById('govtop').innerHTML = `
+      <div class="govtop-in">
+        <div class="emblem">${this.EMBLEM}</div>
+        <div class="govtitles">
+          <span class="gt1">KEMENTERIAN AGRARIA DAN TATA RUANG</span>
+          <span class="gt2">BADAN PERTANAHAN NASIONAL</span>
+          <span class="gt3">KANTOR PERTANAHAN &nbsp;·&nbsp; SISTEM ARSIP DIGITAL</span>
+        </div>
+        <div class="govmeta">
+          <span class="gm-badge"><i class="fas fa-certificate"></i><b>WEBSITE RESMI PEMERINTAH</b></span>
+          <span class="gm-date" id="gov-date">${this.INDONESIA_DATE()}</span>
+        </div>
+      </div>
+      <div class="tricolor"><i></i><i></i><i></i></div>`;
+  },
+  renderFooter() {
+    const area = document.getElementById('footer');
+    if (!area) return;
+    const link = (href, ico, lbl) => `<a href="${href}"><i class="fas ${ico}"></i>${lbl}</a>`;
+    area.innerHTML = `
+      <div class="foot-grid">
+        <div class="foot-about">
+          <div class="emblem">${this.EMBLEM}</div>
+          <div>
+            <b>Sistem Arsip Digital</b>
+            <p>Layanan informasi dan pengelolaan arsip Kantor Pertanahan. Satu data, aman, cepat, dan <b>100% lokal tanpa biaya</b>.</p>
+          </div>
+        </div>
+        <div>
+          <b class="foot-h">Unit Kerja</b>
+          <div class="foot-list">
+            <span>Kementerian ATR / BPN</span>
+            <span>Kantor Pertanahan Kabupaten/Kota</span>
+            <span>Seksi Pelayanan &amp; Administrasi</span>
+            <span>Arsip &amp; Dokumentasi Pertanahan</span>
+          </div>
+        </div>
+        <div>
+          <b class="foot-h">Jam Layanan</b>
+          <div class="foot-list">
+            <span><i class="fas fa-clock"></i> Senin–Kamis: 08.00–15.30 WIB</span>
+            <span><i class="fas fa-clock"></i> Jumat: 08.00–16.00 WIB</span>
+            <span><i class="fas fa-mug-hot"></i> Istirahat: 12.00–13.00 WIB</span>
+          </div>
+        </div>
+        <div>
+          <b class="foot-h">Navigasi</b>
+          <div class="foot-list">
+            ${link('#/dashboard', 'fa-gauge-high', 'Dashboard')}
+            ${link('#/arsip', 'fa-folder-open', 'Arsip Dokumen')}
+            ${link('#/cari', 'fa-magnifying-glass', 'Cari Isi Dokumen')}
+            ${link('#/laporan', 'fa-file-chart-column', 'Laporan &amp; Ekspor')}
+          </div>
+        </div>
+      </div>
+      <div class="foot-bar">
+        <span>&copy; ${new Date().getFullYear()} Badan Pertanahan Nasional — Sistem Arsip Digital Kantor Pertanahan, v3.0</span>
+        <span class="fb-right"><i class="fas fa-lock"></i> Data terenkripsi di perangkat lokal</span>
+      </div>`;
+  },
   renderSidebar() {
     const cur = location.hash || '#/dashboard';
     const items = this.navMenu().filter((x) => x.role !== false && !(x.admin && this.roleOf() !== 'admin'));
     let html = `
       <div class="side-brand">
-        <div class="logo-mini"><i class="fas fa-landmark-dome"></i></div>
-        <div class="nm">Arsip Kantor Pertanahan</div>
+        <div class="logo-mini">${this.EMBLEM}</div>
+        <div class="nm">Arsip Kantor Pertanahan<small>Badan Pertanahan Nasional</small></div>
       </div>
       <div class="side-nav">`;
     for (const it of items) {

@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistem Arsip - Kantor Pertanahan</title>
+<title>Sistem Arsip Digital - Kantor Pertanahan</title>
 <meta name="description" content="Sistem Arsip Digital Kantor Pertanahan - Berjalan 100% lokal, tanpa biaya.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230b6e4f'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23fff' font-family='Arial' font-weight='bold'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 118'%3E%3Cpath d='M50 6 L90 21 V58 C90 83 73 99 50 111 C27 99 10 83 10 58 V21 Z' fill='%230b6e4f'/%3E%3Cpath d='M50 6 L90 21 V58 C90 83 73 99 50 111 C27 99 10 83 10 58 V21 Z' fill='none' stroke='%23e6c65c' stroke-width='4'/%3E%3Cpolygon points='50,18 52.7,25 60.5,26 54.7,31 56.2,38.5 50,35 43.8,38.5 45.3,31 39.5,26 47.3,25' fill='%23e6c65c'/%3E%3Crect x='21' y='48' width='58' height='10' fill='%23ffffff'/%3E%3Crect x='21' y='60' width='58' height='10' fill='%23c3222e'/%3E%3Crect x='21' y='72' width='58' height='10' fill='%23ffffff'/%3E%3C/svg%3E">
 <!-- Font offline dipakai apapun keadaannya -->
 <link rel="preload" href="/fonts/pjs-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
@@ -13,19 +13,25 @@
 </head>
 <body>
   <div id="splash">
-    <div class="s-logo">A</div>
+    <div class="s-logo"><svg viewBox="0 0 100 118" role="img" aria-label="Lambang"><path d="M50 6 L90 21 V58 C90 83 73 99 50 111 C27 99 10 83 10 58 V21 Z" fill="#0b6e4f"/><path d="M50 6 L90 21 V58 C90 83 73 99 50 111 C27 99 10 83 10 58 V21 Z" fill="none" stroke="#e6c65c" stroke-width="4"/><polygon points="50,18 52.7,25 60.5,26 54.7,31 56.2,38.5 50,35 43.8,38.5 45.3,31 39.5,26 47.3,25" fill="#e6c65c"/><rect x="21" y="48" width="58" height="10" fill="#ffffff" stroke="#0b6e4f" stroke-width="1.6"/><rect x="21" y="60" width="58" height="10" fill="#c3222e"/><rect x="21" y="72" width="58" height="10" fill="#ffffff" stroke="#0b6e4f" stroke-width="1.6"/><rect x="40" y="62" width="20" height="6" fill="#0b6e4f"/></svg></div>
     <div class="s-text">S I S T E M&nbsp;&nbsp;A R S I P</div>
     <div class="s-sub">Kantor Pertanahan - Lokal &amp; Gratis</div>
     <div class="s-bar"><span></span></div>
   </div>
 
   <div id="app" class="hidden">
-    <!-- Sidebar di-render JS -->
-    <aside id="sidebar"></aside>
-    <div id="main">
-      <header id="topbar"></header>
-      <main id="content"></main>
+    <!-- Kop resmi pemerintah (di-render JS) -->
+    <div id="govtop"></div>
+    <div class="app-shell">
+      <!-- Sidebar di-render JS -->
+      <aside id="sidebar"></aside>
+      <div id="main">
+        <header id="topbar"></header>
+        <main id="content"></main>
+      </div>
     </div>
+    <!-- Kaki halaman resmi -->
+    <footer id="footer"></footer>
   </div>
 
   <!-- Login (di-render JS) -->
